@@ -1,5 +1,5 @@
 ---
-title: "AI Agent System in ted: How It Works"
+title: "ted AI Agent: Reasoning Loop, Tools, and Action Traces"
 sidebarTitle: "Overview"
 description: "ted's AI agent runs a multi-step reasoning loop with file, shell, and browser tools. Learn how the agent executes tasks and what it can do."
 ---
@@ -15,7 +15,7 @@ At the heart of ted's agent is `runAgentLoop()` — a reasoning loop that drives
     You type an instruction in the Agent Panel (e.g., "Refactor `fetchUser` to handle 404 errors") and press Enter.
   </Step>
   <Step title="The agent reasons and calls tools">
-    The agent reads your message along with its system prompt and any prior conversation. It decides which tool to call first — for example, `read_file` to read the relevant source file — and emits a structured tool call in the format ` ```tool {"name": "read_file", ...} ``` `.
+    The agent reads your message along with its system prompt and any prior conversation. It decides which tool to call first — for example, `read_file` to read the relevant source file — and emits a structured tool call in the format ` ```tool {"tool": "read_file", ...} ``` `.
   </Step>
   <Step title="ted executes the tool">
     ted intercepts the tool call, runs the corresponding action (reading the file, running a command, searching your codebase, etc.), and returns the result to the agent.
@@ -54,15 +54,12 @@ This keeps edits surgical and readable in the trace view — you can see exactly
 
 ## Inline Suggestions
 
-The agent isn't only active when you explicitly send a message. ted's `LLMAgent` also watches passively while you work. After your editor has been **idle for approximately 5 seconds**, it analyzes the current file context — including file content, AST structure, git churn signals, and your recent editing actions — and may generate an inline code suggestion.
+The agent isn't only active when you explicitly send a message. ted also watches passively while you work. After your editor has been **idle for approximately 5 seconds**, it analyzes the current file context — including file content, git churn signals, and your recent editing activity — and may surface a suggestion.
 
-Suggestions appear as **toast notifications** in the corner of the editor. You can:
-
-- **Accept** — applies the suggestion inline at the current cursor position
-- **Dismiss** — discards the suggestion without making any changes
+Suggestions appear as **toast notifications** in the corner of the editor. Dismiss the toast to discard it, or act on any action button it provides.
 
 <Tip>
-  Inline suggestions are most useful when you've just written a function signature or left a comment describing what you want. The agent picks up those hints and drafts the implementation for you.
+  Suggestions are contextual — the agent takes into account which file you're editing, how recently it's been changed in git, and your recent undo/edit patterns. They're most likely to appear when the editor detects uncertainty or complexity in the code you're working in.
 </Tip>
 
 ## Action Traces
@@ -81,7 +78,7 @@ Traces let you audit exactly what the agent did — which files it read, which c
 
 ## What the Agent Can Do
 
-ted's agent has 17 built-in tools spanning four categories:
+ted's agent has 18 built-in tools spanning four categories:
 
 <CardGroup cols={2}>
   <Card title="File Operations" icon="file-code">
@@ -105,7 +102,7 @@ ted's agent has 17 built-in tools spanning four categories:
     How to send messages, read traces, and manage conversation history.
   </Card>
   <Card title="Tools Reference" icon="wrench" href="/agents/tools">
-    Full reference for all 17 agent tools with arguments and examples.
+    Full reference for all 18 agent tools with arguments and examples.
   </Card>
   <Card title="Swarms" icon="circle-nodes" href="/agents/swarms">
     Run multiple agents in parallel with roles, Kanban, and a live graph.

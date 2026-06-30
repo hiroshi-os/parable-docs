@@ -1,5 +1,5 @@
 ---
-title: "Using the Agent Panel to Chat with Your AI"
+title: "Using the ted Agent Panel: Chat, Traces, and History"
 sidebarTitle: "Agent Panel"
 description: "How to open and use the ted Agent Panel: send instructions, view tool traces, manage conversation history, and understand agent responses."
 ---
@@ -51,14 +51,9 @@ Click any trace entry to expand it and see the full details:
 
 ## Inline Suggestions
 
-When you haven't typed anything for approximately **5 seconds**, ted's `LLMAgent` passively analyzes the current file and your recent editing context. If it has a relevant suggestion, it appears as a **toast notification** in the bottom-right corner of the editor.
+When you haven't typed anything for approximately **5 seconds**, ted passively analyzes the current file and your recent editing context. If it has a relevant observation, it appears as a **toast notification** in the corner of the editor. The toast automatically dismisses itself after 10 seconds, or you can dismiss it manually.
 
-| Action | Result |
-|---|---|
-| **Accept** | Applies the suggested code at your cursor position |
-| **Dismiss** | Closes the toast without making any changes |
-
-Inline suggestions are generated from file content, AST structure, git history, and recent cursor activity — they're not random completions, but contextual drafts based on what you appear to be writing next.
+Suggestions are generated from file content, git history, and recent editing activity — they surface patterns like high-churn files, complex code sections, or repeated undo sequences that may indicate a problem worth addressing.
 
 ## Conversation History
 

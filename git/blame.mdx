@@ -1,30 +1,25 @@
 ---
-title: "Line-Level Git Blame in the ted Editor"
+title: "View Line-Level Git Blame Annotations in the ted Editor"
 sidebarTitle: "Blame"
-description: "ted shows git blame information as inline ghost text on the current line, displaying the commit hash, author, and date of the last change."
+description: "ted shows git blame information as inline ghost text on the current line, displaying the author and relative date of the last change to that line."
 ---
 
 ted displays git blame annotations as ghost text directly in the editor — move your cursor to any line to see who last changed it and when. The annotation appears at the end of the line in faint, unobtrusive text, giving you authorship context without interrupting your reading or editing flow.
 
 ## How it works
 
-The blame extension watches your cursor position in real time. Each time you move to a new line, ted calls `git_blame` for that line via libgit2 and renders the result as inline ghost text at the end of the current line. The operation is non-blocking: the annotation appears within milliseconds and does not stall the editor.
-
-<Info>
-  Blame is powered by `git-blame.ts`, a CodeMirror editor extension that hooks into the cursor-change event and dispatches a decoration update whenever the active line changes.
-</Info>
+The blame feature watches your cursor position. Each time you rest on a new line for a moment, ted looks up the blame information for that line and renders the result as inline ghost text at the end of the current line. The lookup is non-blocking and triggered automatically — no command or shortcut required.
 
 ## What the annotation shows
 
-Each blame annotation contains three pieces of information:
+Each blame annotation contains two pieces of information:
 
 | Field | Example | Description |
 |---|---|---|
-| **Hash** | `a3f9c12` | Short (7-character) commit hash of the last change |
 | **Author** | `Maya Patel` | Name of the committer as recorded in git |
 | **Date** | `2 days ago` | Relative time since the commit was made |
 
-The annotation reads like: `a3f9c12 · Maya Patel · 2 days ago`, rendered as ghost text after the last character on the line.
+The annotation reads like: `Maya Patel, 2 days ago`, rendered as ghost text after the last character on the line.
 
 ## No configuration needed
 
@@ -36,20 +31,17 @@ Blame is active by default for every file that belongs to a git repository. You 
 
 ## Combining blame with Commit History
 
-Blame and Commit History are designed to work together.
+Blame and Commit History are designed to work together. When an annotation points to a change you want to understand more deeply, open the Commit History panel to trace the full context of that commit.
 
 <Steps>
   <Step title="Spot an interesting annotation">
-    Move your cursor to a line whose blame annotation — author, date, or hash — you want to investigate further.
-  </Step>
-  <Step title="Note the commit hash">
-    Read the short hash from the ghost text (e.g., `a3f9c12`).
+    Move your cursor to a line whose blame annotation — author or date — you want to investigate further.
   </Step>
   <Step title="Open Commit History">
     Click the clock icon in the sidebar to open the Commit History panel.
   </Step>
   <Step title="Locate the commit">
-    Find the matching hash in the commit graph. Click it to expand the full diff summary, see every file the commit touched, and read the original commit message.
+    Find the matching commit in the graph by author and date. Hover over it to expand the full diff summary, see every file the commit touched, and read the original commit message.
   </Step>
 </Steps>
 
@@ -59,4 +51,4 @@ Blame and Commit History are designed to work together.
 
 ## Annotation updates as you move
 
-The blame annotation always reflects the line where the cursor currently sits. As you navigate through a file — whether by clicking, using arrow keys, or jumping with `Ctrl+G` / `Cmd+G` — the annotation updates automatically to show the blame for the new current line.
+The blame annotation always reflects the line where the cursor currently sits. As you navigate through a file — whether by clicking or using arrow keys — the annotation updates automatically to show the blame for the new current line. Moving to a new line clears the previous annotation until the lookup for the new line completes.

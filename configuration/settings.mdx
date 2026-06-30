@@ -1,5 +1,5 @@
 ---
-title: "Configure ted: Settings, Themes, and AI Provider"
+title: "Configuring ted: Settings, Themes, and AI Providers"
 sidebarTitle: "Settings"
 description: "Complete guide to ted's settings: how to open them, what each option does, and how to edit settings.json directly for user and project overrides."
 ---
@@ -69,12 +69,12 @@ Click the **Edit in settings.json** button in the top-right corner of the settin
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `llm.provider` | `string` | `"ollama"` | LLM backend to use. One of `"ollama"`, `"openai"`, `"anthropic"`, `"google"`. |
-| `llm.model` | `string` | — | Model name, e.g. `"mistral"`, `"gpt-4o"`, `"claude-3-5-sonnet-20241022"`. |
+| `llm.model` | `string` | `"mistral"` | Model name, e.g. `"mistral"`, `"gpt-4o"`, `"claude-3-5-sonnet-20241022"`. |
 | `llm.apiKey` | `string` | — | API key for cloud providers (OpenAI, Anthropic, Google). Not required for Ollama. |
-| `llm.baseUrl` | `string` | — | Optional URL override. Useful for LM Studio or a custom Ollama endpoint. |
+| `llm.baseUrl` | `string` | `"http://localhost:11434"` | URL for the LLM API endpoint. Defaults to the standard Ollama address. Cloud providers use their own endpoints automatically; only set this to route traffic elsewhere. |
 
 <Tip>
-Leave `llm.baseUrl` empty to use each provider's default endpoint. Set it to `http://localhost:1234/v1` to point at LM Studio, or any other OpenAI-compatible API.
+The default `llm.baseUrl` is `http://localhost:11434` (the standard Ollama port). In the current alpha, ted's outbound network permissions allow only a fixed set of hosts: `api.openai.com`, `api.anthropic.com`, `generativelanguage.googleapis.com`, and `localhost:11434`. Requests to other local ports or servers will be blocked. Support for configurable local endpoints is planned.
 </Tip>
 
 ### LSP

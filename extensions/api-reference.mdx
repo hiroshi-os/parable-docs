@@ -310,8 +310,8 @@ Shows a searchable quick-pick dropdown populated with `items`. Returns the item 
 <ParamField path="options.placeHolder" type="string">
   Placeholder text shown in the search input when empty.
 </ParamField>
-<ParamField path="options.getLabel" type="(item: T) => string">
-  A function that returns the display string for each item. Required when `T` is not a plain string.
+<ParamField path="options.getLabel" type="(item: T) => string" required>
+  A function that returns the display string for each item. Required whenever `options` is provided.
 </ParamField>
 
 ---
@@ -370,7 +370,7 @@ Forces the file explorer tree to re-render and re-evaluate all icon providers. C
 onEvent(event: string, handler: (...args: any[]) => void): () => void
 ```
 
-Subscribes to a ted internal event. Events are dispatched on the DOM as `ted:{event}` (for example, the `"fileChanged"` event maps to `ted:fileChanged`). Returns an **unsubscribe function** — store it and call it in `deactivate()` to avoid memory leaks.
+Subscribes to a ted internal event. Events are dispatched on the DOM as `ted:{event}` (for example, the `"fileChanged"` event maps to `ted:fileChanged`). Returns an **unsubscribe function** you can call early if you want to stop listening before the extension is unloaded.
 
 <ParamField path="event" type="string" required>
   The event name without the `ted:` prefix, e.g., `"fileChanged"`.
@@ -379,9 +379,9 @@ Subscribes to a ted internal event. Events are dispatched on the DOM as `ted:{ev
   The function called when the event fires. Arguments vary by event.
 </ParamField>
 
-<Warning>
-  Unlike commands and panels, event subscriptions created with `api.onEvent` are **not** cleaned up automatically if you store the unsubscribe function outside of the TedAPI tracking scope. Always call the returned unsubscribe function in `deactivate()`.
-</Warning>
+<Note>
+  Event subscriptions created with `api.onEvent` are tracked automatically and removed when your extension is unloaded — just like commands, panels, and status bar items. You only need to call the returned unsubscribe function manually if you want to stop listening before the extension is unloaded.
+</Note>
 
 ---
 
@@ -413,7 +413,7 @@ export function activate(api) {
   });
 
   // Update the count whenever the active file changes
-  const unsub = api.onEvent("fileChanged", () => {
+  api.onEvent("fileChanged", () => {
     const file = api.editor.getActiveFile();
     if (!file) {
       api.statusbar.updateItem("wordCount", "Words: —");
@@ -423,10 +423,10 @@ export function activate(api) {
     api.statusbar.updateItem("wordCount", `Words: ${words}`);
   });
 
-  // Register a command to jump to a word offset
+  // Register a command to jump to a character offset
   api.commands.register(
     "goToWord",
-    "Word Count: Go to Word Offset",
+    "Word Count: Go to Character Offset",
     async () => {
       const input = await api.window.showInputBox({ prompt: "Jump to character offset:" });
       if (input === undefined) return;
@@ -434,18 +434,9 @@ export function activate(api) {
       if (!isNaN(offset)) api.editor.setSelection(offset);
     }
   );
-
-  // Store unsub so deactivate can clean it up
-  api._wordCountUnsub = unsub;
-}
-
-export function deactivate() {
-  // Cancel the event subscription manually
-  // (status bar item and command are removed automatically)
-  if (api._wordCountUnsub) api._wordCountUnsub();
 }
 ```
 
 <Note>
-  The status bar item and registered command are removed automatically by ted's `ExtensionCleanup` tracking when the extension is unloaded. You only need the explicit `deactivate` call for the `onEvent` subscription.
+  All resources registered through the TedAPI — commands, status bar items, sidebar panels, and event subscriptions — are removed automatically when the extension is unloaded. You do not need to implement `deactivate` unless you set up resources outside of the TedAPI, such as a `setInterval` or a raw DOM `addEventListener`.
 </Note>

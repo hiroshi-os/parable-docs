@@ -8,12 +8,12 @@ ted supports a first-party extension system — write an extension in plain Java
 
 ## How extensions work
 
-Each extension lives in its own folder inside `~/.config/ted/extensions/`. When ted starts, the `ExtensionHost` scans that directory, reads each `manifest.json`, and activates any extension whose `activationEvents` match the current context. Extensions are loaded dynamically via Blob URLs, which means a plain `.js` file is all you need to get started.
+Each extension lives in its own folder inside `~/.config/ted/extensions/`. When ted starts, it scans that directory, reads each `package.json` manifest, and activates any extension whose `activationEvents` match the current context. A plain `.js` file is all you need to get started — no build pipeline required.
 
 ```
 ~/.config/ted/extensions/
 └── my-extension/
-    ├── manifest.json
+    ├── package.json
     └── index.js
 ```
 
@@ -54,7 +54,7 @@ Extensions interact with ted through the `TedAPI` object passed to their `activa
 
 ## Extension lifecycle
 
-Ted calls your exported `activate(api)` function once when the extension is loaded, passing the full `TedAPI` object. Everything you register inside `activate` — commands, panels, status bar items, icon providers — is tracked by ted's `ExtensionCleanup` mechanism and removed automatically when the extension is unloaded or ted shuts down.
+Ted calls your exported `activate(api)` function once when the extension is loaded, passing the full `TedAPI` object. Everything you register inside `activate` — commands, panels, status bar items, event subscriptions, and icon providers — is tracked automatically and removed when the extension is unloaded or ted shuts down.
 
 ```javascript
 // index.js — minimal lifecycle skeleton
@@ -66,12 +66,12 @@ export function activate(api) {
 export function deactivate() {
   // Called when the extension is unloaded.
   // Most cleanup is automatic, but cancel any
-  // timers or event subscriptions you set up manually.
+  // timers or raw DOM listeners you set up manually.
 }
 ```
 
 <Note>
-  Exporting `deactivate` is optional. Ted will still unload your extension and clean up all registered resources if you omit it. You only need `deactivate` if you set up resources outside of the TedAPI — for example, a `setInterval` or a raw `addEventListener` on the DOM.
+  Exporting `deactivate` is optional. Ted will still unload your extension and clean up all registered resources if you omit it. You only need `deactivate` if you set up resources entirely outside of the TedAPI — for example, a `setInterval` or a raw `addEventListener` on the DOM.
 </Note>
 
 ## Next steps

@@ -1,7 +1,7 @@
 ---
-title: "Install ted on macOS, Linux, and Windows"
+title: "Install ted on macOS, Linux, and Windows from Source"
 sidebarTitle: "Installation"
-description: "Step-by-step instructions to install ted on macOS, Linux, and Windows. Requires Bun, Rust, and Tauri system dependencies."
+description: "Build and run ted on macOS, Linux, or Windows from source. Covers installing Bun, Rust, and the Tauri system dependencies for each platform."
 ---
 
 ted is a [Tauri 2](https://tauri.app) desktop application. Because ted is currently in alpha, there are no pre-built binaries or installers available yet — you'll build it from source using the steps below. The process takes about 10–15 minutes on a first run (mostly Rust compilation) and just a few seconds on subsequent runs.
@@ -80,7 +80,7 @@ For other distributions (Arch, Fedora, NixOS, etc.), refer to the [Tauri Linux p
     Clone the ted source repository and move into the project directory:
 
     ```bash
-    git clone https://github.com/hiroshi-os/Parable.git && cd Parable
+    git clone https://github.com/hiroshi-os/ted.git && cd ted
     ```
   </Step>
   <Step title="Install JavaScript dependencies">
@@ -109,7 +109,7 @@ For other distributions (Arch, Fedora, NixOS, etc.), refer to the [Tauri Linux p
     To produce a standalone, optimized binary for distribution or daily use, run:
 
     ```bash
-    bun run build && bun tauri build
+    bun tauri build
     ```
 
     The output binary and installer will be placed in `src-tauri/target/release/bundle/` in a subdirectory for your platform (e.g., `dmg` on macOS, `deb`/`AppImage` on Linux, `msi`/`exe` on Windows).

@@ -1,10 +1,10 @@
 ---
-title: "Browse Commit History and Graph in ted"
+title: "How to Use the ted Commit History Panel and Graph View"
 sidebarTitle: "Commit History"
-description: "How to open the ted commit history panel, browse the visual commit graph, filter commits by file, and inspect individual commit details."
+description: "How to open the ted commit history panel, browse the visual commit graph, and inspect individual commit details including files changed and line counts."
 ---
 
-ted's Commit History panel shows a visual timeline of your repository's commits with author, date, message, and diff details. Instead of switching to a terminal and running `git log`, you get a fully interactive graph where every commit is one click away from its full change summary — including a file-level breakdown of what was inserted or deleted.
+ted's Commit History panel shows a visual timeline of your repository's commits with author, date, message, and diff details. Instead of switching to a terminal and running `git log`, you get a fully interactive graph where hovering any commit reveals its full change summary — including a file-level breakdown of what was inserted or deleted.
 
 ## Opening the panel
 
@@ -21,45 +21,18 @@ The graph lists commits from newest to oldest. Each row shows:
 | **Author** | The committer's name |
 | **Date** | Commit timestamp |
 
-Commits are connected by graph lines that visualize branching and merging in your repository's history.
+Commits are connected by graph lines that visualize branching and merging in your repository's history. The panel loads the most recent 100 commits by default.
 
 ## Inspecting commit details
 
-<Steps>
-  <Step title="Select a commit">
-    Click any row in the commit graph. The row expands (or a detail pane opens) to show the full commit information.
-  </Step>
-  <Step title="Review the diff summary">
-    The detail view lists every file touched by the commit alongside its stats: **files changed**, **lines inserted (+)**, and **lines deleted (−)**.
-  </Step>
-  <Step title="Open a file at that revision">
-    Click any filename in the commit detail to open that file at the exact revision in a diff view, comparing it to your current working copy. This lets you see exactly what changed in context.
-  </Step>
-</Steps>
+Hover over any row in the commit graph to reveal a **detail popup** for that commit. The popup shows:
 
-<Tip>
-  The short hash shown in Commit History is the same hash that appears in blame annotations. When a blame annotation catches your eye, copy the hash and use it to jump straight to that commit in the history panel.
-</Tip>
+- **Author** and full **date/time** of the commit
+- The complete **commit message**
+- A diff summary: **files changed**, **lines inserted (+)**, and **lines deleted (−)**
+- The short **commit hash**
 
-## Filtering history by file
-
-When you want to trace the history of a single file, you can filter the commit log to show only commits that touched it.
-
-<Steps>
-  <Step title="Make the file active">
-    Open the file you want to investigate in the editor so it becomes the active tab.
-  </Step>
-  <Step title="Enable the file filter">
-    In the Commit History panel, click **Filter by current file** (or the file-path toggle). The graph immediately narrows to only commits that modified, added, or deleted that file.
-  </Step>
-  <Step title="Browse the filtered log">
-    Navigate the filtered commits as normal. Click any entry to see the diff for that file at that revision.
-  </Step>
-</Steps>
-
-<Info>
-  Filtering uses `git log -- <file_path>` under the hood via libgit2, so it accurately follows renames when rename detection is enabled.
-</Info>
+Move the mouse away from the row to dismiss the popup.
 
 ## File churn
 
@@ -70,5 +43,5 @@ Beyond individual commits, ted tracks **file churn** — the number of times eac
 - You can view churn metrics inside the Commit History panel to get a quick sense of which parts of the codebase are hottest right now.
 
 <Tip>
-  Use file-filtered commit history together with churn data to understand *how* a specific file has evolved and *how often* it changes — a powerful combination for onboarding to an unfamiliar codebase.
+  Use commit history together with churn data to understand *how* a specific file has evolved and *how often* it changes — a powerful combination for onboarding to an unfamiliar codebase.
 </Tip>

@@ -1,7 +1,7 @@
 ---
 title: "Git Integration in ted: Status, History, Blame, and More"
 sidebarTitle: "Overview"
-description: "ted has deep git integration built in: view file status, stage changes, commit, browse commit history, and see line-level blame — no external tool needed."
+description: "ted has deep git integration built in: view file status, stage changes, commit, browse commit history, and see line-level blame — no git install needed."
 ---
 
 ted integrates git directly into the editor — no separate git GUI or terminal required for day-to-day version control tasks. Whether you're staging a quick fix, browsing a file's full commit history, or tracking down who wrote a particular line, every git operation you need is a click or keystroke away, without leaving your workspace.
@@ -13,13 +13,13 @@ ted integrates git directly into the editor — no separate git GUI or terminal 
     See all changed files at a glance. Stage or unstage individual files, write your commit message, and commit — all from the sidebar without touching a terminal.
   </Card>
   <Card title="Git Gutter" icon="left-right">
-    Lines added or modified since the last commit are marked directly in the editor margin. Green indicates an added line; orange or yellow marks a modification.
+    Lines added or deleted since the last commit are marked directly in the editor margin, giving you instant visual feedback on what has changed while you edit.
   </Card>
   <Card title="Commit History" icon="clock-rotate-left">
-    Browse the full commit log in a visual graph. Click any commit to see its diff summary — files changed, insertions, and deletions — and open any file at that revision.
+    Browse the full commit log in a visual graph. Hover any commit to see its diff summary — files changed, insertions, and deletions.
   </Card>
   <Card title="Blame" icon="user">
-    Move your cursor to any line to see inline ghost text showing the commit hash, author, and date of the last change to that line.
+    Move your cursor to any line to see inline ghost text showing the author and relative date of the last change to that line.
   </Card>
 </CardGroup>
 
@@ -29,7 +29,7 @@ ted also tracks *file churn* — how frequently each file changes over a configu
 
 ## Prerequisites
 
-ted's git integration is powered by **libgit2** (via the `git2` Rust crate), which ships inside the application. You do not need a system `git` installation for core features.
+ted's git integration ships entirely inside the application. You do not need a system `git` installation for core features to work.
 
 <Note>
   Your project must be a git repository — that is, it must contain a `.git` directory at its root. ted detects this automatically when you open a folder. If the folder is not a git repo, the Source Control panel and related features will remain inactive.
@@ -56,7 +56,7 @@ ted's git integration is powered by **libgit2** (via the `git2` Rust crate), whi
     Stage files, write commit messages, view diffs, and use the git gutter.
   </Card>
   <Card title="Commit History" icon="timeline" href="/git/commit-history">
-    Browse the visual commit graph, filter by file, and inspect commit details.
+    Browse the visual commit graph and inspect commit details.
   </Card>
   <Card title="Blame" icon="magnifying-glass" href="/git/blame">
     Read per-line blame annotations inline, right inside the editor.

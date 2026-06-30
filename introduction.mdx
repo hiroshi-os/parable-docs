@@ -1,7 +1,7 @@
 ---
 title: "ted: Minimalist Code Editor for AI-Assisted Development"
 sidebarTitle: "Introduction"
-description: "Learn what ted is, who it's built for, and how its AI agent system, git integration, LSP support, and extension API work together."
+description: "Learn what ted is, who it's built for, and how its AI agent loop, git integration, tree-sitter editor, and extension API work together."
 ---
 
 **ted** is a minimalist desktop code editor built for developers who want AI agents as a first-class part of their workflow. Instead of bolting AI features onto an existing editor, ted is designed around the agent loop from the start — letting you run, inspect, and iterate on AI agents alongside your code, git history, and terminal in a single native application.
@@ -16,10 +16,10 @@ The project is currently in active development at version **0.4.0-alpha**. Core 
 
 <CardGroup cols={2}>
   <Card title="Editor" icon="code">
-    CodeMirror 6 editing surface with tree-sitter syntax highlighting, multi-pane buffer management, tabs, and Language Server Protocol (LSP) support for completions, diagnostics, hover documentation, and go-to-definition.
+    CodeMirror 6 editing surface with tree-sitter syntax highlighting, multi-pane buffer management, tabs, and a high-density file tree for fast project navigation.
   </Card>
   <Card title="AI Agents" icon="robot">
-    A built-in LLM agent loop with tool-calling support. Connect to Ollama (local), OpenAI, Anthropic, or Google. The Swarms view lets you run and coordinate multiple agents simultaneously.
+    A built-in LLM agent loop with tool-calling support. Connect to Ollama (local), OpenAI, Anthropic, or Google. Agents can read, write, search, and list files in your project directly.
   </Card>
   <Card title="Git Integration" icon="code-branch">
     Visual commit history with a graph view, per-line blame, a staging area, and commit — all inside the editor. No need to switch to a terminal or external git GUI.
@@ -31,7 +31,7 @@ The project is currently in active development at version **0.4.0-alpha**. Core 
     A TedAPI extension system lets you add custom panels, register new commands, bind keybindings, and integrate external tools. Extensions are loaded at runtime.
   </Card>
   <Card title="LSP Support" icon="magnifying-glass">
-    Language Server Protocol client for completions, inline diagnostics, hover cards, and go-to-definition. Works with any language server you already have installed.
+    Language Server Protocol integration is in active development. LSP-powered completions, diagnostics, hover cards, and go-to-definition are planned for an upcoming release.
   </Card>
 </CardGroup>
 

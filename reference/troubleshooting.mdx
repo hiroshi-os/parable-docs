@@ -1,7 +1,7 @@
 ---
-title: "Troubleshooting Common ted Issues"
+title: "Troubleshooting ted: Solutions to Common Editor Problems"
 sidebarTitle: "Troubleshooting"
-description: "Solutions to common ted issues: build failures, Tauri startup errors, LSP not working, Ollama connection errors, and extension loading problems."
+description: "Solutions to common ted problems: window not opening, syntax highlighting missing, LSP completions absent, Ollama not responding, and settings not saving."
 ---
 
 If ted isn't working as expected, this page covers the most common issues and how to fix them. Each section describes the symptom, the most likely cause, and the steps to resolve it. If your issue isn't listed here, check the [FAQ](/reference/faq) or open a GitHub issue.
@@ -183,7 +183,7 @@ If ted isn't working as expected, this page covers the most common issues and ho
   </Accordion>
 
   <Accordion title="Git features are not working">
-    ted's git integration uses libgit2 directly — it does not shell out to the `git` binary. This means:
+    ted's git integration is built-in and does not rely on the `git` command-line tool being installed. This means:
 
     - The folder you have open **must be a git repository** (it must contain a `.git` directory at its root or in a parent directory).
     - SSH-based remotes require your SSH keys to be available to the `ssh-agent`.

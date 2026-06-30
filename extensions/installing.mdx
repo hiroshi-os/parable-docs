@@ -4,7 +4,7 @@ sidebarTitle: "Installing"
 description: "How to install a ted extension from the marketplace or manually, and how to create your first extension with a manifest and JavaScript entry file."
 ---
 
-Extensions are installed by placing a folder in the ted extensions directory — there is no installer, registry command, or package manager involved. If the folder contains a valid `manifest.json` and a JavaScript entry file, ted picks it up automatically on the next startup.
+Extensions are installed by placing a folder in the ted extensions directory — there is no installer, registry command, or package manager involved. If the folder contains a valid `package.json` manifest and a JavaScript entry file, ted picks it up automatically on the next startup.
 
 ## Installing manually
 
@@ -28,14 +28,14 @@ Extensions are installed by placing a folder in the ted extensions directory —
     ```
     ~/.config/ted/extensions/
     └── my-extension/
-        ├── manifest.json
+        ├── package.json
         └── index.js
     ```
   </Step>
   <Step title="Verify the folder contents">
     The folder must contain at minimum:
-    - A `manifest.json` file with the required fields (`name`, `version`, `displayName`, `main`)
-    - The JavaScript entry file referenced by `manifest.json`'s `main` field
+    - A `package.json` file with the required fields (`name`, `version`, `displayName`, `main`)
+    - The JavaScript entry file referenced by `package.json`'s `main` field
 
     Missing either file will cause ted to skip the extension silently.
   </Step>
@@ -78,7 +78,7 @@ mkdir -p ~/.config/ted/extensions/hello-ted
 
 ### 2. Write the manifest
 
-Create `~/.config/ted/extensions/hello-ted/manifest.json`:
+Create `~/.config/ted/extensions/hello-ted/package.json`:
 
 ```json
 {

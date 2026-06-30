@@ -1,5 +1,5 @@
 ---
-title: "Language Server Protocol Setup in ted"
+title: "LSP Setup and Language Server Configuration in ted"
 sidebarTitle: "LSP Setup"
 description: "Configure Language Server Protocol support in ted for autocompletion, diagnostics, hover, and go-to-definition across TypeScript, Rust, Python, and C++."
 ---
@@ -129,7 +129,7 @@ Each key under `servers` maps to a language identifier. The value has three fiel
 | Field | Type | Description |
 |---|---|---|
 | `command` | `string` | The executable to run. Must be on your `PATH` or an absolute path. |
-| `args` | `string[]` | Command-line arguments passed to the server. Most servers require `["--stdio"]`. |
+| `args` | `string[]` | Command-line arguments passed to the server. Varies by server — `typescript-language-server` requires `["--stdio"]`, while `rust-analyzer` and `pylsp` take no arguments. |
 | `enabled` | `boolean` | Whether to start this server. Omit or set to `true` to enable. |
 
 <Tip>

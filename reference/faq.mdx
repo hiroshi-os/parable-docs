@@ -1,7 +1,7 @@
 ---
-title: "Frequently Asked Questions About ted"
+title: "Frequently Asked Questions About the ted Code Editor"
 sidebarTitle: "FAQ"
-description: "Answers to common questions about ted: alpha status, supported platforms, LLM costs, extension publishing, and planned features."
+description: "Answers to common questions about ted: pricing, supported platforms, alpha status, AI privacy, offline use, and planned features like remote development."
 ---
 
 Here are answers to the questions most frequently asked about ted. If you have a question that isn't covered here, check the [Troubleshooting](/reference/troubleshooting) page or open a discussion on GitHub.
@@ -51,25 +51,24 @@ Here are answers to the questions most frequently asked about ted. If you have a
   </Accordion>
 
   <Accordion title="Can I use my own LLM or a self-hosted model?">
-    Yes. ted supports any **OpenAI-compatible API endpoint** via the `llm.baseUrl` setting. Set the provider to `openai` and point `baseUrl` at your server:
+    Yes, with one important constraint. ted's network permissions currently allow outbound HTTP requests to a fixed set of endpoints: `api.openai.com`, `api.anthropic.com`, `generativelanguage.googleapis.com`, and `localhost:11434` (the default Ollama port). Requests to any other address — including LM Studio on `localhost:1234` — will be blocked.
+
+    **Ollama on the default port** works out of the box. Set the provider to `ollama` and leave `baseUrl` at its default:
 
     ```json
     {
       "llm": {
-        "provider": "openai",
-        "model": "your-model-name",
-        "baseUrl": "http://localhost:1234/v1"
+        "provider": "ollama",
+        "model": "your-model-name"
       }
     }
     ```
 
-    This works with:
-    - **LM Studio** — set `baseUrl` to `http://localhost:1234/v1`
-    - **vLLM** — set `baseUrl` to your vLLM server address
-    - **Ollama with a custom port** — set `baseUrl` to `http://localhost:<port>`
-    - Any other server that implements the OpenAI Chat Completions API
+    **Ollama on a custom port** is not supported in the current alpha because the allowed endpoint is pinned to `localhost:11434`. Start Ollama on its default port instead.
 
-    No `apiKey` is required for local servers (you can omit the field or set it to any non-empty string if the server requires one).
+    **LM Studio and other local servers** are not yet supported in pre-built releases. If you build ted from source, you can extend the allowed endpoint list in `src-tauri/capabilities/default.json` to include your server's address.
+
+    Support for configurable local endpoints is planned for a future release.
   </Accordion>
 
   <Accordion title="Can I publish extensions?">

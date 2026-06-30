@@ -1,19 +1,14 @@
 ---
-title: "Stage and Commit Changes with ted Source Control"
+title: "Stage, Unstage, and Commit Changes in ted Source Control"
 sidebarTitle: "Status & Staging"
-description: "How to view file status, stage and unstage files, write commit messages, and create commits using the ted Source Control panel."
+description: "How to view file status, stage and unstage individual files, write commit messages, and create commits using the ted Source Control panel."
 ---
 
 The Source Control panel gives you a live view of your repository's working tree status. As you edit files, ted continuously reads the git index and surfaces every changed, added, or deleted file — no manual refresh needed. From the same panel, you stage your changes, write a commit message, and commit, all without leaving the editor.
 
 ## Opening the panel
 
-Click the **branch icon** in the left sidebar to open the Source Control panel. You can also reach it through the Command Palette:
-
-1. Press `Ctrl+Shift+P` / `Cmd+Shift+P` to open the Command Palette.
-2. Type **Source Control** and press `Enter`.
-
-The panel opens docked to the sidebar and stays in sync with your working tree as you edit.
+Click the **branch icon** in the left sidebar to open the Source Control panel. The panel opens docked to the sidebar and stays in sync with your working tree as you edit.
 
 ## File status indicators
 
@@ -22,7 +17,7 @@ Each file in the Source Control panel carries a short status badge that tells yo
 | Badge | Meaning |
 |---|---|
 | **M** | Modified — a tracked file with uncommitted changes |
-| **A** / **new** | Added — a new, previously untracked file |
+| **N** | New — a previously untracked file that has been added |
 | **D** | Deleted — a tracked file that has been removed |
 
 Files appear in two sections: **Staged Changes** (files queued for the next commit) and **Changes** (files modified but not yet staged).
@@ -34,34 +29,28 @@ Files appear in two sections: **Staged Changes** (files queued for the next comm
     Hover over a file in the **Changes** section and click the **`+`** icon that appears to its right. The file moves to the **Staged Changes** section.
   </Step>
   <Step title="Unstage a file">
-    Hover over a file in the **Staged Changes** section and click the **`−`** icon. The file returns to **Changes** (git resets it to HEAD).
-
-    To unstage everything at once, click **Unstage All** at the top of the Staged Changes section.
+    Hover over a file in the **Staged Changes** section and click the **`−`** icon. The file is removed from the staging area and returns to **Changes**.
   </Step>
 </Steps>
-
-<Tip>
-  You can stage or unstage all files in one click using the **Stage All** (`+` on the Changes section header) and **Unstage All** controls — useful when you want to start a commit from a clean slate.
-</Tip>
 
 ## Writing a commit message and committing
 
 <Steps>
   <Step title="Write your message">
-    Click the commit message input field at the top of the Source Control panel and type your commit message. ted does not enforce any format, but conventional commit messages (e.g., `feat: add login flow`) work well.
+    Click the commit message input field in the Source Control panel and type your commit message. ted does not enforce any format, but conventional commit messages (e.g., `feat: add login flow`) work well.
   </Step>
   <Step title="Commit staged changes">
-    Click the **✓ checkmark** button, or press `Ctrl+Enter` / `Cmd+Enter`, to create the commit. ted commits exactly the files in the **Staged Changes** section.
+    Click the **Commit** button to create the commit. ted commits exactly the files listed in the **Staged Changes** section.
   </Step>
 </Steps>
 
 <Note>
-  You must have at least one file staged and a non-empty commit message before the commit button becomes active.
+  You must have at least one file staged and a non-empty commit message before the **Commit** button becomes active.
 </Note>
 
 ## Viewing a diff
 
-Click any modified file in the Source Control panel to open a **diff view** in the editor. ted renders a side-by-side comparison using its built-in merge/diff viewer, with the original version on the left and your working copy on the right. Removed lines appear in red and added lines in green.
+Click any modified file in the Source Control panel to open a **diff view** in the editor. ted renders a comparison using its built-in diff viewer, with removed lines in red and added lines in green.
 
 ## Git gutter
 
@@ -70,10 +59,10 @@ While you edit, ted marks changed lines directly in the editor's left margin —
 | Marker color | Meaning |
 |---|---|
 | Green bar | Line was added since the last commit |
-| Orange / yellow bar | Line was modified since the last commit |
+| Red bar | Line was deleted since the last commit |
 
-Gutter markers update in real time as you type. Click a marker to see a compact inline diff of just that hunk.
+Gutter markers update as you edit. They reflect the difference between your current working copy and what was last committed.
 
 <Note>
-  ted currently supports local commits only. Push and pull to remote repositories will be available in a future release.
+  ted currently supports local commits only. Push and pull to remote repositories are not yet available.
 </Note>

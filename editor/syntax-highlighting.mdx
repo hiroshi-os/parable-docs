@@ -1,14 +1,14 @@
 ---
-title: "Syntax Highlighting with Tree-Sitter in ted"
+title: "Syntax Highlighting in ted with Tree-Sitter and Lezer"
 sidebarTitle: "Syntax Highlighting"
-description: "ted uses web-tree-sitter for precise, grammar-based syntax highlighting across 12+ languages including TypeScript, Python, and Rust."
+description: "ted uses web-tree-sitter for precise, grammar-based syntax highlighting across ten languages, with CodeMirror lezer grammars covering the rest."
 ---
 
-ted uses [web-tree-sitter](https://github.com/tree-sitter/tree-sitter/tree/master/lib/binding_web) for syntax highlighting instead of the regex-based approaches common in many editors. Tree-sitter parses your source file into a full Abstract Syntax Tree (AST) on every keystroke — incrementally, so only the changed portions are re-parsed — delivering accurate, context-aware highlighting even for complex nested structures like JSX inside TypeScript, or deeply templated Rust generics.
+ted uses [web-tree-sitter](https://github.com/tree-sitter/tree-sitter/tree/master/lib/binding_web) for syntax highlighting instead of the regex-based approaches common in many editors. Tree-sitter parses your source file into a full Abstract Syntax Tree (AST) on every keystroke — incrementally, so only the changed portions are re-parsed — delivering accurate, context-aware highlighting even for complex nested structures like JSX inside TypeScript, or deeply templated Rust generics. For languages where a tree-sitter grammar is not bundled, ted falls back to the battle-tested lezer grammars that ship with CodeMirror 6.
 
 ## How It Works
 
-Parsing is computationally intensive enough that running it on the main UI thread would cause noticeable lag. ted offloads all tree-sitter work to a dedicated **Web Worker** (`tree-sitter.worker.ts`) that runs in parallel with the rest of the editor.
+Parsing is computationally intensive enough that running it on the main UI thread would cause noticeable lag. ted offloads all tree-sitter work to a dedicated **Web Worker** that runs in parallel with the rest of the editor.
 
 <Steps>
   <Step title="File opens in the editor">
@@ -31,22 +31,22 @@ Parsing is computationally intensive enough that running it on the main UI threa
 
 ## Supported Languages
 
-ted ships grammar bundles for the following languages out of the box:
+ted ships highlighting for the following languages out of the box. Languages marked **Tree-sitter** use compiled `.wasm` grammar bundles running in the background worker; languages marked **Lezer** use CodeMirror's built-in grammar engine.
 
-| Language | File Extensions |
-|---|---|
-| JavaScript | `.js`, `.mjs`, `.cjs` |
-| TypeScript | `.ts`, `.tsx` |
-| Python | `.py` |
-| Rust | `.rs` |
-| C / C++ | `.c`, `.cpp`, `.h`, `.hpp` |
-| HTML | `.html`, `.htm` |
-| CSS | `.css` |
-| JSON | `.json` |
-| YAML | `.yml`, `.yaml` |
-| Markdown | `.md`, `.mdx` |
-| Java | `.java` |
-| XML | `.xml` |
+| Language | File Extensions | Highlighter |
+|---|---|---|
+| JavaScript | `.js`, `.mjs`, `.cjs`, `.jsx` | Tree-sitter |
+| TypeScript | `.ts`, `.tsx` | Tree-sitter |
+| Python | `.py` | Tree-sitter |
+| Rust | `.rs` | Tree-sitter |
+| C / C++ | `.c`, `.cpp`, `.h`, `.hpp`, `.cc` | Tree-sitter |
+| HTML | `.html`, `.htm` | Tree-sitter |
+| CSS | `.css`, `.scss`, `.less` | Tree-sitter |
+| JSON | `.json` | Tree-sitter |
+| Java | `.java` | Lezer |
+| XML | `.xml`, `.svg` | Lezer |
+| YAML | `.yml`, `.yaml`, `.toml` | Lezer |
+| Markdown | `.md`, `.mdx`, `.markdown` | Lezer |
 
 ## Language Detection
 
@@ -58,7 +58,7 @@ ted determines the language for a file automatically by matching its extension a
 
 ## Theming
 
-Syntax colors are driven by ted's semantic theming system. Each tree-sitter token type (keyword, string, comment, function name, and so on) maps to a semantic color role defined by the active theme.
+Syntax colors are driven by ted's semantic theming system. Each token type (keyword, string, comment, function name, and so on) maps to a semantic color role defined by the active theme.
 
 To switch themes, open **Settings → Appearance → Theme** and select from the available options. The change takes effect immediately across all open editor tabs.
 
@@ -68,11 +68,4 @@ To switch themes, open **Settings → Appearance → Theme** and select from the
 
 ## Beyond Highlighting
 
-Tree-sitter grammars in ted serve double duty. In addition to powering syntax highlighting, the AST they produce is used by LSP-less **code intelligence features** such as:
-
-- **Complexity analysis** — ted can surface a cyclomatic complexity score for functions using only the AST, without a running language server.
-- **AST-based suggestions** — certain agent and refactoring actions use the parsed tree to understand code structure before proposing edits.
-
-<Note>
-  These intelligence features are distinct from LSP-based completions and diagnostics. They work entirely from the tree-sitter parse result and require no external language server to be installed.
-</Note>
+The AST produced by tree-sitter grammars serves double duty in ted. In addition to powering syntax highlighting, it feeds the **AI agent** with structural context about your code — giving the agent a precise understanding of function boundaries, variable scopes, and code structure before it proposes edits or suggests refactors.

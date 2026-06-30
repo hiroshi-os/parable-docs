@@ -1,7 +1,7 @@
 ---
-title: "Agent Tools Reference: Files, Shell, and Browser"
+title: "ted Agent Tools Reference: Files, Shell, and Browser"
 sidebarTitle: "Tools"
-description: "Complete reference for all 17 tools available to the ted AI agent: file operations, codebase search, terminal commands, and browser automation."
+description: "Complete reference for all 18 tools available to the ted AI agent: file operations, codebase search, terminal commands, and browser automation."
 ---
 
 The ted agent has access to a set of tools it calls automatically during its reasoning loop. You never invoke these tools directly — the agent chooses which ones to use based on your instructions. Understanding what each tool does, what arguments it accepts, and when the agent reaches for it will help you write better prompts and make sense of the traces you see in the Agent Panel.
@@ -19,7 +19,7 @@ These tools let the agent read, write, and navigate your local filesystem.
 Reads the contents of a file and returns it with line numbers. Supports paginated reads for large files.
 
 <ParamField path="target_file" type="string" required>
-  Path to the file to read, relative to the workspace root.
+  Absolute path to the file to read.
 </ParamField>
 <ParamField path="offset" type="number">
   Line number to start reading from. Defaults to the beginning of the file.
@@ -37,7 +37,7 @@ Reads the contents of a file and returns it with line numbers. Supports paginate
 Lists the contents of a directory — files and subdirectories — one entry per line.
 
 <ParamField path="target_directory" type="string" required>
-  Path to the directory to list, relative to the workspace root.
+  Absolute path to the directory to list.
 </ParamField>
 
 **Example scenario:** When you ask the agent to "add an index file to the utils folder," it calls `list_dir` on `src/utils/` first to see what already exists.
@@ -151,13 +151,13 @@ Executes a shell command in the workspace root and returns its `stdout` and `std
   The shell command to run (e.g., `npm test`, `git log --oneline -10`).
 </ParamField>
 <ParamField path="timeout" type="number">
-  Timeout in seconds. If the command hasn't finished by then, it continues running in the background and returns a **PID** you can poll with `check_background_cmd`.
+  Timeout in milliseconds. If the command hasn't finished by then, it continues running in the background and returns a **PID** you can poll with `check_background_cmd`. Defaults to 5000 ms (5 seconds).
 </ParamField>
 
 **Example scenario:** You ask the agent to "run the test suite and tell me what's failing." It calls `run_terminal_cmd` with `npm test`, captures the output, and summarizes which tests failed.
 
 <Note>
-  Long-running commands (like dev servers or build watchers) that exceed the timeout are moved to the background. The agent receives a PID and can check on them later using `check_background_cmd`.
+  Long-running commands (like dev servers or build watchers) that exceed the timeout (in milliseconds) are moved to the background. The agent receives a PID and can check on them later using `check_background_cmd`.
 </Note>
 
 ---
@@ -186,6 +186,16 @@ Schedules a message to be sent back to the agent after a delay. Useful for tasks
 </ParamField>
 
 **Example scenario:** The agent starts a dev server, then calls `schedule_request` with a 5-second delay and the message "Check if the dev server is running on port 3000" to verify it started successfully.
+
+---
+
+### `todo_write`
+
+Signals to the agent that it has updated its internal to-do list for the current task. This tool is used by the agent to mark progress on multi-step work; it accepts any content and always confirms with a success message.
+
+<ParamField path="todos" type="string">
+  The updated to-do list or task notes. The agent uses this to track sub-steps across tool calls.
+</ParamField>
 
 ---
 

@@ -1,7 +1,7 @@
 ---
-title: "Writing and Editing Code in ted"
+title: "Writing, Editing, and Saving Your Code Files in ted"
 sidebarTitle: "Editing"
-description: "How to write and edit code in ted: auto-save, the diff viewer, find and replace, indentation, and working with the editor gutter."
+description: "How to write and edit code in ted: auto-save, find and replace, indentation guides, line numbers, font size, the diff viewer, and git annotations."
 ---
 
 ted uses [CodeMirror 6](https://codemirror.net/) as its editing engine, giving you a fast, extensible text editing surface with first-class support for modern language tooling. Every editing feature described on this page works inside that CodeMirror pane — no separate modes or views to switch between.
@@ -82,19 +82,6 @@ On the line where your cursor currently rests, ted renders **inline ghost text**
 
 ## Per-Project Settings
 
-ted resolves settings in two layers: your user-level preferences and an optional project-level override.
+ted supports two layers of settings: **User** settings that apply across all workspaces, and **Project** settings that apply only to the currently open folder. Both layers are accessible from the same Settings popup (<kbd>Ctrl+,</kbd> / <kbd>Cmd+,</kbd>) — use the **User** and project-name tabs at the top of the popup to switch between them.
 
-<Tip>
-  Create a `.ted/settings.json` file at the root of your workspace to override any user-level setting for that specific project. For example, you can enforce a particular indent width or disable auto-save for repos that use their own git hooks.
-</Tip>
-
-```json
-// .ted/settings.json
-{
-  "editor.indentSize": 2,
-  "editor.autoSave": false,
-  "editor.lineNumbers": true
-}
-```
-
-Project-level settings take precedence over user-level settings for every workspace session that opens that folder.
+Project settings override the corresponding user setting for every workspace session that opens that folder. You can also click **Edit in settings.json** inside the popup to edit either layer as raw JSON directly in the editor.
