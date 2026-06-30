@@ -1,0 +1,125 @@
+---
+title: "Configure ted: Settings, Themes, and AI Provider"
+sidebarTitle: "Settings"
+description: "Complete guide to ted's settings: how to open them, what each option does, and how to edit settings.json directly for user and project overrides."
+---
+
+ted has two layers of settings — user-level settings that apply globally across every project, and project-level settings stored in `.ted/settings.json` inside your project folder. Project settings override user settings whenever a project is open, letting you keep different configurations for different codebases without touching your global defaults.
+
+## Opening Settings
+
+Press `Ctrl+,` on Windows/Linux or `Cmd+,` on macOS to open the settings popup. You can also reach it through the Command Palette — press `Ctrl+P` / `Cmd+P` and type **Settings**.
+
+## User vs. Project Settings
+
+<Info>
+User settings apply everywhere. Project settings only apply when that specific folder is open — and they take precedence over user settings for every key they define.
+</Info>
+
+The settings popup has two tabs:
+
+- **User** — edits `~/.config/ted/settings.json`
+- **Project** — edits `<project-folder>/.ted/settings.json`
+
+Switch to the **Project** tab to create or modify project-level overrides. If the `.ted/` directory doesn't exist yet, ted creates it automatically when you save.
+
+### Edit in settings.json
+
+Click the **Edit in settings.json** button in the top-right corner of the settings popup to open the underlying JSON file directly in the editor. This is the fastest way to bulk-edit settings or paste in a configuration you've copied from somewhere else.
+
+## Settings File Locations
+
+| Scope | Path |
+|---|---|
+| User (global) | `~/.config/ted/settings.json` |
+| Project | `<project-folder>/.ted/settings.json` |
+
+## Settings Reference
+
+### General
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `autoSave` | `boolean` | `false` | Automatically save files on change. When `false`, save manually with `Ctrl/Cmd+S`. |
+
+### Appearance
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `theme` | `string` | `"ted"` | Active color theme. One of `"ted"`, `"ted light"`, `"ted solarized"`, `"ted solarized light"`. |
+| `volume` | `number` | `50` | Volume (0–100) for the tape-spinner click sound. Set to `0` to silence it entirely. |
+| `uiBlur` | `boolean` | `false` | Adds a subtle motion blur during panel transitions. |
+
+### Editor
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `fontSize` | `number` | `15` | Editor font size in pixels. |
+| `lineNumbers` | `boolean` | `true` | Show or hide line numbers in the gutter. |
+| `indentGuides` | `boolean` | `true` | Show vertical indent guide lines. |
+
+### Files
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `sidebarWidth` | `number` | `240` | Width of the file-explorer sidebar in pixels. |
+
+### AI Assistant
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `llm.provider` | `string` | `"ollama"` | LLM backend to use. One of `"ollama"`, `"openai"`, `"anthropic"`, `"google"`. |
+| `llm.model` | `string` | — | Model name, e.g. `"mistral"`, `"gpt-4o"`, `"claude-3-5-sonnet-20241022"`. |
+| `llm.apiKey` | `string` | — | API key for cloud providers (OpenAI, Anthropic, Google). Not required for Ollama. |
+| `llm.baseUrl` | `string` | — | Optional URL override. Useful for LM Studio or a custom Ollama endpoint. |
+
+<Tip>
+Leave `llm.baseUrl` empty to use each provider's default endpoint. Set it to `http://localhost:1234/v1` to point at LM Studio, or any other OpenAI-compatible API.
+</Tip>
+
+### LSP
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `lsp.enabled` | `boolean` | `true` | Master switch for all Language Server Protocol features. |
+| `lsp.servers` | `object` | — | Per-language server overrides. See [LSP Setup](/configuration/lsp) for details. |
+
+## Example settings.json
+
+Here is a complete example you can use as a starting point. Copy it into `~/.config/ted/settings.json` and adjust to your preferences.
+
+```json
+{
+  "autoSave": true,
+  "theme": "ted light",
+  "fontSize": 14,
+  "lineNumbers": true,
+  "indentGuides": true,
+  "sidebarWidth": 220,
+  "llm": {
+    "provider": "openai",
+    "model": "gpt-4o",
+    "apiKey": "sk-..."
+  },
+  "lsp": {
+    "enabled": true
+  }
+}
+```
+
+<Note>
+JSON does not allow comments or trailing commas. If ted fails to parse your settings file, it will fall back to defaults. Open the DevTools console (right-click → Inspect) to see the parse error.
+</Note>
+
+## Project-level Override Example
+
+To use a different theme and font size for a single project, add this to `<project-folder>/.ted/settings.json`:
+
+```json
+{
+  "theme": "ted solarized",
+  "fontSize": 13
+}
+```
+
+All other settings continue to inherit from your user config.

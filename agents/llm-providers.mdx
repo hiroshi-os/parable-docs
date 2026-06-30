@@ -1,0 +1,164 @@
+---
+title: "Configure LLM Providers: Ollama, OpenAI, Anthropic, Gemini"
+sidebarTitle: "LLM Providers"
+description: "Connect ted to Ollama, OpenAI, Anthropic (Claude), or Google Gemini. Configure your provider, model name, API key, and base URL in Settings."
+---
+
+ted supports four LLM providers — Ollama, OpenAI, Anthropic, and Google Gemini — and lets you switch between them at any time from Settings. You can run fully locally with no API key using Ollama, or connect to the latest cloud models from OpenAI, Anthropic, or Google. In Swarms mode, each agent can use a different provider and model independently.
+
+## How to Configure Your Provider
+
+<Steps>
+  <Step title="Open Settings">
+    Press `Ctrl+,` on Windows/Linux or `Cmd+,` on macOS to open the Settings panel.
+  </Step>
+  <Step title="Go to AI Assistant">
+    Select the **AI Assistant** section from the settings sidebar.
+  </Step>
+  <Step title="Choose a provider">
+    Select your provider from the **Provider** dropdown: `ollama`, `openai`, `anthropic`, or `google`.
+  </Step>
+  <Step title="Enter your model and credentials">
+    Fill in the **Model Name** field and, if required, paste your **API Key**. Optionally override the **Base URL** if you're using a custom inference endpoint.
+  </Step>
+  <Step title="Save and reload">
+    Click **Save**. The agent immediately uses the new settings for all subsequent messages.
+  </Step>
+</Steps>
+
+---
+
+## Ollama (Local)
+
+Ollama is ted's **default provider**. It runs open-source models entirely on your own machine — no internet connection or API key required. Your code and conversations never leave your computer.
+
+**Default model:** `mistral`  
+**Default URL:** `http://localhost:11434`
+
+### Setting Up Ollama
+
+<Steps>
+  <Step title="Install Ollama">
+    Download and install Ollama from [https://ollama.ai](https://ollama.ai). It runs as a local background service.
+  </Step>
+  <Step title="Pull a model">
+    Open your terminal and pull the model you want to use:
+
+    ```bash
+    ollama pull mistral
+    ```
+
+    Or try other models:
+
+    ```bash
+    ollama pull llama3
+    ollama pull codellama
+    ollama pull qwen2.5-coder
+    ollama pull phi3
+    ```
+  </Step>
+  <Step title="Configure in ted">
+    In **Settings → AI Assistant**, set Provider to `ollama` and Model Name to the model you pulled (e.g., `mistral`, `codellama`). The Base URL defaults to `http://localhost:11434` — leave it as-is unless you're running Ollama on a different host or port.
+  </Step>
+</Steps>
+
+**Supported models include:**
+
+| Model | Best for |
+|---|---|
+| `mistral` | General coding tasks, fast responses |
+| `codellama` | Code generation and completion |
+| `llama3` | General reasoning and instruction following |
+| `qwen2.5-coder` | Code-focused tasks with strong multilingual support |
+| `phi3` | Lightweight, fast responses on low-resource machines |
+
+<Tip>
+  Ollama is ideal for offline use, privacy-sensitive codebases, and fast iteration. If response quality isn't meeting your needs, try a larger model like `llama3:70b` (requires sufficient VRAM) or switch to a cloud provider.
+</Tip>
+
+---
+
+## OpenAI
+
+OpenAI's GPT models offer strong general-purpose reasoning and broad coding ability. An API key is required.
+
+**Get an API key:** [https://platform.openai.com](https://platform.openai.com) → API Keys
+
+**Recommended models:**
+
+| Model | Notes |
+|---|---|
+| `gpt-4o` | Best overall quality; multimodal |
+| `gpt-4o-mini` | Fast and cost-efficient for most tasks |
+| `gpt-4-turbo` | High context window, strong reasoning |
+
+### Using an OpenAI-Compatible Server
+
+The Base URL setting lets you point ted's OpenAI provider at any OpenAI-compatible inference server — not just OpenAI itself. This means you can use:
+
+- **LM Studio** (local GUI for running open models):
+  ```
+  http://localhost:1234/v1
+  ```
+- **vLLM** (self-hosted high-performance inference):
+  ```
+  http://your-server:8000/v1
+  ```
+- **Together AI, Groq, Fireworks, and others** that expose an OpenAI-compatible API
+
+<Info>
+  When using a third-party OpenAI-compatible server, set the Model Name to whatever model identifier that server expects (e.g., `meta-llama/Llama-3-8b-chat-hf` for Together AI) and paste the server's API key if required.
+</Info>
+
+---
+
+## Anthropic (Claude)
+
+Anthropic's Claude models excel at complex multi-step reasoning, long-context tasks, and nuanced code generation. An API key is required.
+
+**Get an API key:** [https://console.anthropic.com](https://console.anthropic.com)
+
+**Recommended models:**
+
+| Model | Notes |
+|---|---|
+| `claude-3-5-sonnet-20241022` | Best balance of intelligence and speed |
+| `claude-3-haiku-20240307` | Fastest and most cost-efficient Claude model |
+
+<Tip>
+  Claude is particularly well-suited for large refactors, architectural reasoning, and tasks where you need the agent to explain its decisions clearly. Consider assigning a Claude model to the lead agent in a Swarm for high-level coordination.
+</Tip>
+
+---
+
+## Google Gemini
+
+Google's Gemini models are available through Google AI Studio and offer competitive performance on coding and reasoning tasks. An API key is required.
+
+**Get an API key:** [https://aistudio.google.com](https://aistudio.google.com)
+
+**Recommended models:**
+
+| Model | Notes |
+|---|---|
+| `gemini-1.5-pro` | Long context (1M tokens), strong reasoning |
+| `gemini-1.5-flash` | Fast, efficient, cost-effective |
+
+---
+
+## Settings Reference
+
+| Setting | Description | Example |
+|---|---|---|
+| **Provider** | Which LLM backend to use | `ollama`, `openai`, `anthropic`, `google` |
+| **Model Name** | The model identifier passed to the provider | `mistral`, `gpt-4o`, `claude-3-5-sonnet-20241022`, `gemini-1.5-pro` |
+| **API Key** | Required for cloud providers; not used by Ollama | `sk-...`, `AIza...` |
+| **Base URL** | Optional endpoint override for custom servers | `http://localhost:11434`, `http://localhost:1234/v1` |
+
+<Warning>
+  API keys are stored in your ted user settings file on disk in plain text. Treat them like passwords — don't commit your settings file to version control, and rotate keys immediately if you believe they've been exposed.
+</Warning>
+
+<Tip>
+  In **Swarms mode**, each agent has its own Provider and Model settings configured from the Models deck. You can mix providers freely — for example, use a fast local Ollama model for file search tasks and a Claude agent as the lead for high-level reasoning. See [Swarms](/agents/swarms) for details.
+</Tip>

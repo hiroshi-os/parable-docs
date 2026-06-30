@@ -1,0 +1,78 @@
+---
+title: "Syntax Highlighting with Tree-Sitter in ted"
+sidebarTitle: "Syntax Highlighting"
+description: "ted uses web-tree-sitter for precise, grammar-based syntax highlighting across 12+ languages including TypeScript, Python, and Rust."
+---
+
+ted uses [web-tree-sitter](https://github.com/tree-sitter/tree-sitter/tree/master/lib/binding_web) for syntax highlighting instead of the regex-based approaches common in many editors. Tree-sitter parses your source file into a full Abstract Syntax Tree (AST) on every keystroke — incrementally, so only the changed portions are re-parsed — delivering accurate, context-aware highlighting even for complex nested structures like JSX inside TypeScript, or deeply templated Rust generics.
+
+## How It Works
+
+Parsing is computationally intensive enough that running it on the main UI thread would cause noticeable lag. ted offloads all tree-sitter work to a dedicated **Web Worker** (`tree-sitter.worker.ts`) that runs in parallel with the rest of the editor.
+
+<Steps>
+  <Step title="File opens in the editor">
+    ted detects the language from the file's extension and instructs the worker to load the matching tree-sitter grammar (a compiled `.wasm` binary).
+  </Step>
+  <Step title="Worker parses the AST">
+    The worker parses the full file on first load, then re-parses only the changed ranges as you edit. Parsing never blocks the UI thread.
+  </Step>
+  <Step title="Highlighting ranges are sent to the main thread">
+    The worker posts token ranges and their semantic types back to the main thread. CodeMirror applies the corresponding theme classes to those ranges in the editor.
+  </Step>
+  <Step title="Display updates instantly">
+    Because the worker runs concurrently, the editor remains fully responsive while the AST is being built or rebuilt.
+  </Step>
+</Steps>
+
+<Info>
+  The incremental re-parsing strategy means that a large file with a small edit only re-parses the region around the change — not the entire file. This keeps highlighting latency imperceptible even in files with thousands of lines.
+</Info>
+
+## Supported Languages
+
+ted ships grammar bundles for the following languages out of the box:
+
+| Language | File Extensions |
+|---|---|
+| JavaScript | `.js`, `.mjs`, `.cjs` |
+| TypeScript | `.ts`, `.tsx` |
+| Python | `.py` |
+| Rust | `.rs` |
+| C / C++ | `.c`, `.cpp`, `.h`, `.hpp` |
+| HTML | `.html`, `.htm` |
+| CSS | `.css` |
+| JSON | `.json` |
+| YAML | `.yml`, `.yaml` |
+| Markdown | `.md`, `.mdx` |
+| Java | `.java` |
+| XML | `.xml` |
+
+## Language Detection
+
+ted determines the language for a file automatically by matching its extension against the table above. No configuration is required — open a `.rs` file and Rust highlighting is active immediately.
+
+<Note>
+  If a file has no extension or uses an uncommon extension, ted falls back to plain-text mode with no highlighting. You can override this manually by selecting a language from the status bar at the bottom of the editor pane.
+</Note>
+
+## Theming
+
+Syntax colors are driven by ted's semantic theming system. Each tree-sitter token type (keyword, string, comment, function name, and so on) maps to a semantic color role defined by the active theme.
+
+To switch themes, open **Settings → Appearance → Theme** and select from the available options. The change takes effect immediately across all open editor tabs.
+
+<Tip>
+  Because theming is semantic rather than hard-coded per language, installing a new theme automatically applies correct colors to every language ted supports — you never need a separate theme extension per language.
+</Tip>
+
+## Beyond Highlighting
+
+Tree-sitter grammars in ted serve double duty. In addition to powering syntax highlighting, the AST they produce is used by LSP-less **code intelligence features** such as:
+
+- **Complexity analysis** — ted can surface a cyclomatic complexity score for functions using only the AST, without a running language server.
+- **AST-based suggestions** — certain agent and refactoring actions use the parsed tree to understand code structure before proposing edits.
+
+<Note>
+  These intelligence features are distinct from LSP-based completions and diagnostics. They work entirely from the tree-sitter parse result and require no external language server to be installed.
+</Note>

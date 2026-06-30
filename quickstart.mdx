@@ -1,47 +1,70 @@
 ---
-title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+title: "Get Started with ted in 5 Minutes"
+sidebarTitle: "Quickstart"
+description: "Open your first project in ted, run the AI agent on a file, and explore git history — all in under 5 minutes."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
-
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
-
-## Prerequisites
-
-Before you begin, you must have:
-
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
-
-## Get started
+This guide walks you through your first session with ted — from launching the editor to running an AI agent on your code and browsing your git history. By the end you'll have a solid feel for how ted's core features fit together. If you haven't installed ted yet, start with the [Installation guide](/installation).
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+  <Step title="Launch ted">
+    From your terminal, navigate to the ted project directory and start the editor:
 
     ```bash
-    npm install your-package
+    bun tauri dev
     ```
+
+    If you've built a production binary, you can open it directly from your applications folder or by double-clicking the binary. Either way, ted opens as a frameless desktop window at 1200×800 pixels and displays the **Welcome screen**.
   </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
+  <Step title="Open a project folder">
+    ted works with local directories on your machine. To open a project:
 
-    ```bash
-    your-cli init
-    ```
+    - Click the **folder icon** in the sidebar, or
+    - Press **Ctrl+O** (Windows/Linux) or **Cmd+O** (macOS) to open a directory picker.
+
+    Once you select a folder, the file tree appears in the left sidebar. You'll see your project's directory structure, ready to navigate.
   </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+  <Step title="Open a file">
+    Click any file in the explorer to open it in the editor. ted uses [CodeMirror 6](https://codemirror.net) with [tree-sitter](https://tree-sitter.github.io/tree-sitter/) syntax highlighting, so your code is highlighted immediately — no language server warm-up required for basic highlighting.
 
-    ```bash
-    your-cli start
-    ```
+    You can open multiple files at once. Each file opens in its own **tab**, and you can drag tabs to the edge of the editor area to create a **split pane** layout and view two files side by side.
+  </Step>
+  <Step title="Run the AI agent">
+    ted has a built-in AI agent loop that can read your files, answer questions, and suggest or apply edits.
+
+    1. Click the **robot icon** in the sidebar to open the **Agent panel**.
+    2. Type a question or instruction about your code — for example, *"Explain what this function does"* or *"Refactor this to use async/await"*.
+    3. Press **Enter** to send your message.
+
+    The agent reads the relevant files in your project and responds with an explanation, a diff, or direct edits depending on the instruction. You can connect the agent to **Ollama** (local), **OpenAI**, **Anthropic**, or **Google** — see the [AI Agents guide](/agents/overview) to configure your provider.
+  </Step>
+  <Step title="Explore git history">
+    If your project folder is a git repository, ted's git integration activates automatically.
+
+    - Click the **git icon** (Source Control) in the sidebar to see the current status of your working tree — modified, staged, and untracked files.
+    - Open the **Commit History** panel to browse a visual commit graph, inspect individual commits, and see which files changed.
+    - Click any file in the history view to see a per-line **blame** annotation showing which commit last touched each line.
+
+    You can stage files, write a commit message, and commit — all without opening a terminal.
   </Step>
 </Steps>
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+## Tips to explore next
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
+Once you're comfortable with the basics, these features will speed up your workflow:
+
+<Tip>
+  Press **Ctrl+P** (Windows/Linux) or **Cmd+P** (macOS) to open the **Command Palette**. From there you can jump to any file by name, run editor commands, and access settings — all from the keyboard.
 </Tip>
+
+<Tip>
+  Press **Ctrl+,** (Windows/Linux) or **Cmd+,** (macOS) to open **Settings** and customize ted's appearance, keybindings, and AI provider configuration.
+</Tip>
+
+<Tip>
+  To create a **split pane**, drag any open tab to the left, right, top, or bottom edge of the editor area. Split panes let you view two files simultaneously — useful when comparing implementations or keeping a reference file open while you edit.
+</Tip>
+
+<Note>
+  For a deeper look at the AI agent system — including how to configure providers, use Swarms for multi-agent workflows, and understand tool-calling — see the [AI Agents](/agents/overview) docs. For a full walkthrough of staging, committing, blame, and history, see the [Git Integration](/git/overview) docs.
+</Note>

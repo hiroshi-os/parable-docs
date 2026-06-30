@@ -1,0 +1,115 @@
+---
+title: "Frequently Asked Questions About ted"
+sidebarTitle: "FAQ"
+description: "Answers to common questions about ted: alpha status, supported platforms, LLM costs, extension publishing, and planned features."
+---
+
+Here are answers to the questions most frequently asked about ted. If you have a question that isn't covered here, check the [Troubleshooting](/reference/troubleshooting) page or open a discussion on GitHub.
+
+<AccordionGroup>
+  <Accordion title="Is ted free?">
+    Yes. ted is open-source under the MIT license — you can download it, build it, modify it, and use it for any purpose without paying anything.
+
+    The one cost to be aware of is **LLM usage**. The AI assistant's pricing depends entirely on which provider you configure:
+
+    | Provider | Cost |
+    |---|---|
+    | Ollama | Free — all inference runs locally on your machine |
+    | OpenAI | Charged per token by OpenAI |
+    | Anthropic | Charged per token by Anthropic |
+    | Google | Charged per token by Google |
+
+    If cost is a concern, configure Ollama as your provider. See [Settings](/configuration/settings) for setup details.
+  </Accordion>
+
+  <Accordion title="What platforms does ted support?">
+    ted runs on **macOS**, **Linux**, and **Windows**. All three platforms are supported through Tauri 2's cross-platform build system, which compiles a native desktop application from a shared Rust + TypeScript codebase.
+
+    Platform-specific notes:
+    - **macOS** — tested on Apple Silicon and Intel. Requires macOS 11 or later.
+    - **Linux** — requires `webkit2gtk` and GTK3 libraries. Most modern desktop distributions include these.
+    - **Windows** — requires the Microsoft Edge WebView2 runtime, which ships with Windows 11. Windows 10 users may need to install it separately.
+  </Accordion>
+
+  <Accordion title="Is ted stable? Is it ready for production use?">
+    ted is currently at **v0.4.0-alpha**. It is functional and used daily by its developers, but it carries the expectations of alpha software:
+
+    - Core features (editor, terminal, git, LSP, AI assistant) work reliably for most use cases.
+    - Some features are still being stabilized — notably LSP edge cases, the plugin system, and the extension Marketplace.
+    - Breaking changes to configuration formats or APIs may occur between releases.
+
+    We recommend using ted for your own projects and development workflows, but keeping a backup of critical work as you would with any pre-1.0 tool.
+  </Accordion>
+
+  <Accordion title="Does the AI agent send my code to a cloud service?">
+    **Only if you configure a cloud provider.** Here is exactly what each provider does:
+
+    - **Ollama (default)** — all inference runs locally. No code or prompts leave your machine.
+    - **OpenAI, Anthropic, Google** — your prompts (which may include code context) are sent to that provider's API. Their respective privacy policies apply.
+
+    If you work with sensitive or proprietary code, use Ollama to keep everything local.
+  </Accordion>
+
+  <Accordion title="Can I use my own LLM or a self-hosted model?">
+    Yes. ted supports any **OpenAI-compatible API endpoint** via the `llm.baseUrl` setting. Set the provider to `openai` and point `baseUrl` at your server:
+
+    ```json
+    {
+      "llm": {
+        "provider": "openai",
+        "model": "your-model-name",
+        "baseUrl": "http://localhost:1234/v1"
+      }
+    }
+    ```
+
+    This works with:
+    - **LM Studio** — set `baseUrl` to `http://localhost:1234/v1`
+    - **vLLM** — set `baseUrl` to your vLLM server address
+    - **Ollama with a custom port** — set `baseUrl` to `http://localhost:<port>`
+    - Any other server that implements the OpenAI Chat Completions API
+
+    No `apiKey` is required for local servers (you can omit the field or set it to any non-empty string if the server requires one).
+  </Accordion>
+
+  <Accordion title="Can I publish extensions?">
+    The ted Extension Marketplace is in alpha and is not yet open for public submissions. You can still share extensions by distributing the extension folder directly — anyone can drop it into their ted extensions directory to install it.
+
+    Official Marketplace publishing (with discovery, versioning, and one-click install) is planned for a future release.
+  </Accordion>
+
+  <Accordion title="Does ted support remote development (SSH or containers)?">
+    Not yet. Remote development — connecting to a remote machine via SSH or opening a project inside a Docker container — is on the ted roadmap but has not been implemented in the current alpha.
+
+    For now, ted is a local-only editor. All files, terminals, and language servers run on your local machine.
+  </Accordion>
+
+  <Accordion title="Can I use ted without an internet connection?">
+    Yes, with one configuration requirement: set your LLM provider to **Ollama**. Ollama runs entirely offline and is the default provider.
+
+    All other ted features — the code editor, integrated terminal, git integration, LSP, syntax highlighting, and file management — work completely offline regardless of your LLM settings.
+
+    If you have configured a cloud LLM provider (OpenAI, Anthropic, or Google), the AI assistant will not be available without internet access, but everything else continues to work normally.
+  </Accordion>
+
+  <Accordion title="Why does the first build take so long?">
+    ted's backend is written in Rust and built with Tauri 2. The first time you run `bun tauri dev` or `bun tauri build`, Cargo compiles all Rust dependencies from source. Depending on your machine, this can take **5–10 minutes**.
+
+    Subsequent builds are much faster because Cargo caches compiled artifacts and only recompiles what changed. In practice, incremental rebuilds during development take only a few seconds.
+
+    <Tip>
+    You can speed up incremental development by using `bun tauri dev` instead of a full `bun tauri build` during active work — it uses a faster debug build profile and hot-reloads the frontend without restarting the Tauri process.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Where is my settings file?">
+    ted stores settings in two locations:
+
+    | Scope | Path |
+    |---|---|
+    | User (global) | `~/.config/ted/settings.json` |
+    | Project | `<project-folder>/.ted/settings.json` |
+
+    User settings apply everywhere. Project settings override user settings for that specific workspace. See [Settings](/configuration/settings) for a full explanation of the two-layer system and all available options.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,451 @@
+---
+title: "TedAPI Reference for Extension Developers"
+sidebarTitle: "API Reference"
+description: "Complete reference for the TedAPI: editor, commands, sidebar, status bar, workspace, file system, window, and icon provider interfaces."
+---
+
+The `TedAPI` is the object passed to your extension's `activate(api)` function. It gives you access to every integration point ted exposes to extensions — from opening files and registering commands to mounting sidebar panels and overriding file icons. Every namespace below is available on the single `api` argument; you never need to import anything.
+
+```javascript
+export function activate(api) {
+  // api.editor, api.commands, api.sidebar, api.statusbar,
+  // api.workspace, api.fs, api.window, api.icons, api.onEvent
+  // api.extensionPath
+}
+```
+
+---
+
+## `api.editor`
+
+The editor namespace lets you interact with the currently open document and show notifications to the user.
+
+### `openFile`
+
+```typescript
+openFile(path: string): Promise<void>
+```
+
+Opens a file in the main editor view. `path` must be an absolute filesystem path. Resolves once the file is loaded and displayed.
+
+<ParamField path="path" type="string" required>
+  Absolute path to the file you want to open.
+</ParamField>
+
+---
+
+### `getActiveFile`
+
+```typescript
+getActiveFile(): { path: string; name: string; content: string } | null
+```
+
+Returns an object describing the currently active file, or `null` if no file is open.
+
+<ResponseField name="path" type="string">
+  Absolute path to the file on disk.
+</ResponseField>
+<ResponseField name="name" type="string">
+  The file's basename (e.g., `"index.js"`).
+</ResponseField>
+<ResponseField name="content" type="string">
+  The full text content of the file as currently displayed in the editor.
+</ResponseField>
+
+---
+
+### `showNotification`
+
+```typescript
+showNotification(message: string, type?: "info" | "warning" | "error"): void
+```
+
+Displays a toast notification in the editor UI.
+
+<ParamField path="message" type="string" required>
+  The text to display in the notification.
+</ParamField>
+<ParamField path="type" type='"info" | "warning" | "error"'>
+  Visual style of the notification. Defaults to `"info"`.
+</ParamField>
+
+---
+
+### `setSelection`
+
+```typescript
+setSelection(anchor: number, head?: number): void
+```
+
+Moves the cursor or sets a selection range using character offsets from the start of the document.
+
+<ParamField path="anchor" type="number" required>
+  The fixed end of the selection (or the cursor position if `head` is omitted).
+</ParamField>
+<ParamField path="head" type="number">
+  The moving end of the selection. When `head` differs from `anchor`, text between them is selected.
+</ParamField>
+
+---
+
+### `getSelection`
+
+```typescript
+getSelection(): { anchor: number; head: number } | null
+```
+
+Returns the current cursor position or selection range as character offsets, or `null` if the editor has no active selection.
+
+---
+
+## `api.commands`
+
+### `register`
+
+```typescript
+register(id: string, label: string, handler: () => void | Promise<void>): void
+```
+
+Registers a command that appears in the Command Palette. Ted automatically namespaces the ID as `extensionName.id` using the `name` field from your manifest, so a `register("sayHello", …)` call from an extension named `hello-ted` becomes the command `hello-ted.sayHello`.
+
+<ParamField path="id" type="string" required>
+  A unique string identifier for the command within your extension (no dots or spaces).
+</ParamField>
+<ParamField path="label" type="string" required>
+  The human-readable label shown in the Command Palette. Consider prefixing it with your extension name for discoverability, e.g., `"Hello: Greet the User"`.
+</ParamField>
+<ParamField path="handler" type="() => void | Promise<void>" required>
+  The function called when the user runs the command. May be async.
+</ParamField>
+
+<Tip>
+  Commands are automatically removed when your extension is unloaded — you don't need to call any cleanup function yourself.
+</Tip>
+
+---
+
+## `api.sidebar`
+
+### `registerPanel`
+
+```typescript
+registerPanel(
+  id: string,
+  label: string,
+  render: (container: HTMLElement) => void | (() => void)
+): void
+```
+
+Registers a panel in the ted sidebar. When the user opens the panel, ted calls your `render` function with an `HTMLElement` that you can populate however you like.
+
+<ParamField path="id" type="string" required>
+  A unique string identifier for the panel within your extension.
+</ParamField>
+<ParamField path="label" type="string" required>
+  The label displayed on the sidebar icon or panel header.
+</ParamField>
+<ParamField path="render" type="(container: HTMLElement) => void | (() => void)" required>
+  Called with the panel's root `HTMLElement`. Optionally return a cleanup function — ted calls it when the panel is closed or the extension is unloaded.
+</ParamField>
+
+---
+
+## `api.statusbar`
+
+### `addItem`
+
+```typescript
+addItem(
+  id: string,
+  text: string,
+  opts?: {
+    align?: "left" | "right";
+    priority?: number;
+    onClick?: () => void;
+  }
+): void
+```
+
+Adds an item to the bottom status bar.
+
+<ParamField path="id" type="string" required>
+  A unique string identifier for the item within your extension. Used to update or remove the item later.
+</ParamField>
+<ParamField path="text" type="string" required>
+  The text (or emoji) displayed in the status bar.
+</ParamField>
+<ParamField path="opts.align" type='"left" | "right"'>
+  Which side of the status bar to place the item on. Defaults to `"right"`.
+</ParamField>
+<ParamField path="opts.priority" type="number">
+  Ordering weight within the chosen side. Higher values push the item further from the center. Defaults to `0`.
+</ParamField>
+<ParamField path="opts.onClick" type="() => void">
+  Optional click handler. When provided, the item is rendered as a button.
+</ParamField>
+
+---
+
+### `updateItem`
+
+```typescript
+updateItem(id: string, text: string): void
+```
+
+Updates the displayed text of an existing status bar item. Call this in response to editor events to keep the item's content fresh.
+
+<ParamField path="id" type="string" required>
+  The ID passed to `addItem` when the item was created.
+</ParamField>
+<ParamField path="text" type="string" required>
+  The new text to display.
+</ParamField>
+
+---
+
+### `removeItem`
+
+```typescript
+removeItem(id: string): void
+```
+
+Removes a status bar item immediately.
+
+<ParamField path="id" type="string" required>
+  The ID of the item to remove.
+</ParamField>
+
+---
+
+## `api.workspace`
+
+### `getPath`
+
+```typescript
+getPath(): string | null
+```
+
+Returns the absolute path of the folder currently open as a workspace (i.e., the root shown in the file explorer), or `null` if no folder is open.
+
+---
+
+## `api.fs`
+
+The `fs` namespace provides basic file I/O. All paths should be absolute.
+
+### `readFile`
+
+```typescript
+readFile(path: string): Promise<string>
+```
+
+Reads the contents of a file and returns them as a UTF-8 string. Rejects if the file doesn't exist or can't be read.
+
+<ParamField path="path" type="string" required>
+  Absolute path to the file.
+</ParamField>
+
+---
+
+### `writeFile`
+
+```typescript
+writeFile(path: string, content: string): Promise<void>
+```
+
+Writes a UTF-8 string to a file. Creates the file if it doesn't exist; overwrites it if it does. Rejects if the path is not writable.
+
+<ParamField path="path" type="string" required>
+  Absolute path to the file.
+</ParamField>
+<ParamField path="content" type="string" required>
+  The text content to write.
+</ParamField>
+
+---
+
+### `listDir`
+
+```typescript
+listDir(path: string): Promise<{ name: string; path: string; isDir: boolean }[]>
+```
+
+Lists the contents of a directory. Returns an array of entry objects.
+
+<ParamField path="path" type="string" required>
+  Absolute path to the directory.
+</ParamField>
+
+<ResponseField name="name" type="string">
+  The entry's basename.
+</ResponseField>
+<ResponseField name="path" type="string">
+  The entry's absolute path.
+</ResponseField>
+<ResponseField name="isDir" type="boolean">
+  `true` if the entry is a directory, `false` if it is a file.
+</ResponseField>
+
+---
+
+## `api.window`
+
+### `showQuickPick`
+
+```typescript
+showQuickPick<T>(
+  items: T[],
+  options?: {
+    placeHolder?: string;
+    getLabel: (item: T) => string;
+  }
+): Promise<T | undefined>
+```
+
+Shows a searchable quick-pick dropdown populated with `items`. Returns the item the user selected, or `undefined` if they dismissed the picker.
+
+<ParamField path="items" type="T[]" required>
+  The array of items to display. Can be strings, objects, or anything — `getLabel` controls what the user sees.
+</ParamField>
+<ParamField path="options.placeHolder" type="string">
+  Placeholder text shown in the search input when empty.
+</ParamField>
+<ParamField path="options.getLabel" type="(item: T) => string">
+  A function that returns the display string for each item. Required when `T` is not a plain string.
+</ParamField>
+
+---
+
+### `showInputBox`
+
+```typescript
+showInputBox(options?: {
+  prompt?: string;
+  value?: string;
+}): Promise<string | undefined>
+```
+
+Shows a modal text input dialog. Returns the string the user entered, or `undefined` if they cancelled.
+
+<ParamField path="options.prompt" type="string">
+  Instructional text displayed above the input field.
+</ParamField>
+<ParamField path="options.value" type="string">
+  Pre-filled value for the input field.
+</ParamField>
+
+---
+
+## `api.icons`
+
+### `registerFileIconProvider`
+
+```typescript
+registerFileIconProvider(
+  provider: (path: string, is_dir: boolean, is_expanded: boolean) => string | undefined
+): void
+```
+
+Registers a custom icon provider for the file explorer tree. Ted calls your `provider` function for every entry it renders. Return an emoji or icon string to override the default icon, or `undefined` to let ted (or another provider) handle it.
+
+<ParamField path="provider" type="(path, is_dir, is_expanded) => string | undefined" required>
+  A function receiving the entry's absolute `path`, a boolean `is_dir` indicating whether it's a directory, and `is_expanded` indicating whether the directory is currently open. Return an icon string or `undefined`.
+</ParamField>
+
+---
+
+### `refresh`
+
+```typescript
+refresh(): void
+```
+
+Forces the file explorer tree to re-render and re-evaluate all icon providers. Call this after changing the logic or data your provider depends on.
+
+---
+
+## `api.onEvent`
+
+```typescript
+onEvent(event: string, handler: (...args: any[]) => void): () => void
+```
+
+Subscribes to a ted internal event. Events are dispatched on the DOM as `ted:{event}` (for example, the `"fileChanged"` event maps to `ted:fileChanged`). Returns an **unsubscribe function** — store it and call it in `deactivate()` to avoid memory leaks.
+
+<ParamField path="event" type="string" required>
+  The event name without the `ted:` prefix, e.g., `"fileChanged"`.
+</ParamField>
+<ParamField path="handler" type="(...args: any[]) => void" required>
+  The function called when the event fires. Arguments vary by event.
+</ParamField>
+
+<Warning>
+  Unlike commands and panels, event subscriptions created with `api.onEvent` are **not** cleaned up automatically if you store the unsubscribe function outside of the TedAPI tracking scope. Always call the returned unsubscribe function in `deactivate()`.
+</Warning>
+
+---
+
+## `api.extensionPath`
+
+```typescript
+extensionPath: string
+```
+
+The absolute path to your extension's folder on disk. Use this to load local assets (images, config files, WASM modules, etc.) relative to your extension directory.
+
+```javascript
+const configPath = api.extensionPath + "/config.json";
+const config = JSON.parse(await api.fs.readFile(configPath));
+```
+
+---
+
+## Full example: word count status bar item
+
+This extension demonstrates several API namespaces together: it adds a live word count to the status bar and updates it every time the active file changes.
+
+```javascript
+export function activate(api) {
+  // Add the status bar item on the right side
+  api.statusbar.addItem("wordCount", "Words: 0", {
+    align: "right",
+    priority: 10,
+  });
+
+  // Update the count whenever the active file changes
+  const unsub = api.onEvent("fileChanged", () => {
+    const file = api.editor.getActiveFile();
+    if (!file) {
+      api.statusbar.updateItem("wordCount", "Words: —");
+      return;
+    }
+    const words = file.content.split(/\s+/).filter(Boolean).length;
+    api.statusbar.updateItem("wordCount", `Words: ${words}`);
+  });
+
+  // Register a command to jump to a word offset
+  api.commands.register(
+    "goToWord",
+    "Word Count: Go to Word Offset",
+    async () => {
+      const input = await api.window.showInputBox({ prompt: "Jump to character offset:" });
+      if (input === undefined) return;
+      const offset = parseInt(input, 10);
+      if (!isNaN(offset)) api.editor.setSelection(offset);
+    }
+  );
+
+  // Store unsub so deactivate can clean it up
+  api._wordCountUnsub = unsub;
+}
+
+export function deactivate() {
+  // Cancel the event subscription manually
+  // (status bar item and command are removed automatically)
+  if (api._wordCountUnsub) api._wordCountUnsub();
+}
+```
+
+<Note>
+  The status bar item and registered command are removed automatically by ted's `ExtensionCleanup` tracking when the extension is unloaded. You only need the explicit `deactivate` call for the `onEvent` subscription.
+</Note>

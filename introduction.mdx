@@ -1,0 +1,80 @@
+---
+title: "ted: Minimalist Code Editor for AI-Assisted Development"
+sidebarTitle: "Introduction"
+description: "Learn what ted is, who it's built for, and how its AI agent system, git integration, LSP support, and extension API work together."
+---
+
+**ted** is a minimalist desktop code editor built for developers who want AI agents as a first-class part of their workflow. Instead of bolting AI features onto an existing editor, ted is designed around the agent loop from the start — letting you run, inspect, and iterate on AI agents alongside your code, git history, and terminal in a single native application.
+
+## What is ted?
+
+ted is a native desktop application built on [Tauri 2](https://tauri.app), which means it runs as a real desktop app on macOS, Linux, and Windows — not in a browser, not on a server. The editor surface is powered by [CodeMirror 6](https://codemirror.net), giving you a fast, extensible editing experience with [tree-sitter](https://tree-sitter.github.io/tree-sitter/) syntax highlighting for a broad set of languages.
+
+The project is currently in active development at version **0.4.0-alpha**. Core features are functional, but the API surface and configuration format may change between releases as the project matures.
+
+## Key capabilities
+
+<CardGroup cols={2}>
+  <Card title="Editor" icon="code">
+    CodeMirror 6 editing surface with tree-sitter syntax highlighting, multi-pane buffer management, tabs, and Language Server Protocol (LSP) support for completions, diagnostics, hover documentation, and go-to-definition.
+  </Card>
+  <Card title="AI Agents" icon="robot">
+    A built-in LLM agent loop with tool-calling support. Connect to Ollama (local), OpenAI, Anthropic, or Google. The Swarms view lets you run and coordinate multiple agents simultaneously.
+  </Card>
+  <Card title="Git Integration" icon="code-branch">
+    Visual commit history with a graph view, per-line blame, a staging area, and commit — all inside the editor. No need to switch to a terminal or external git GUI.
+  </Card>
+  <Card title="Terminal" icon="terminal">
+    A native PTY terminal embedded directly in the editor. Run build tools, dev servers, scripts, or any shell command without leaving ted.
+  </Card>
+  <Card title="Extensions" icon="puzzle-piece">
+    A TedAPI extension system lets you add custom panels, register new commands, bind keybindings, and integrate external tools. Extensions are loaded at runtime.
+  </Card>
+  <Card title="LSP Support" icon="magnifying-glass">
+    Language Server Protocol client for completions, inline diagnostics, hover cards, and go-to-definition. Works with any language server you already have installed.
+  </Card>
+</CardGroup>
+
+## What ted is not
+
+ted is a **native desktop application**. It is not:
+
+- A **cloud IDE** — ted runs entirely on your local machine. There is no server, no account, and no cloud sync.
+- A **web app** — ted is not accessed through a browser. It is packaged as a native binary via Tauri.
+- A **server process** — ted does not run in the background or expose a port. It opens as a standard desktop window.
+
+If you need a browser-based or cloud-hosted editor, ted is not the right tool. If you want a fast, local, agent-first editor that runs like any other desktop app, ted is built for you.
+
+## Supported languages
+
+ted provides tree-sitter syntax highlighting for the following languages out of the box:
+
+| Language | Syntax Highlighting |
+|---|---|
+| JavaScript | ✓ |
+| TypeScript | ✓ |
+| Python | ✓ |
+| Rust | ✓ |
+| C++ | ✓ |
+| HTML | ✓ |
+| CSS | ✓ |
+| JSON | ✓ |
+| YAML | ✓ |
+| Markdown | ✓ |
+| Java | ✓ |
+| XML | ✓ |
+
+Additional language support can be added through the extension system as tree-sitter grammars become available.
+
+## Next steps
+
+Ready to get ted running on your machine?
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Build ted from source on macOS, Linux, or Windows.
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Open a project, run an AI agent, and explore git history in under 5 minutes.
+  </Card>
+</CardGroup>

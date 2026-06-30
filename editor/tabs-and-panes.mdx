@@ -1,0 +1,93 @@
+---
+title: "Managing Tabs and Editor Panes in ted"
+sidebarTitle: "Tabs & Panes"
+description: "How to open, arrange, close, and split editor tabs in ted. Use multiple panes and workspaces to work on files side by side."
+---
+
+ted keeps every file you open as a tab in the **NavTape** — the horizontal bar running across the top of the editor area. You can have as many tabs open as you like, reorder them by dragging, split the editor into two independent panes, and run entirely separate workspace sessions in the same window. All of this is designed so you can stay focused on your code rather than managing windows.
+
+## Opening Files
+
+There are three quick ways to open a file:
+
+- **File Explorer** — click any file in the sidebar Explorer panel. The file opens in a new tab to the right of the currently active tab.
+- **Command Palette** — press <kbd>Ctrl+P</kbd> / <kbd>Cmd+P</kbd>, start typing part of the filename, and select the result. ted performs fuzzy matching against every file in the workspace.
+- **New file** — use **File → New** (or <kbd>Ctrl+N</kbd> / <kbd>Cmd+N</kbd>) to create a blank untitled file. You will be prompted for a name and location when you first save it.
+
+## Tab Types
+
+Not every tab holds a text file. ted supports four distinct tab types, each rendered differently in the NavTape:
+
+<CardGroup cols={2}>
+  <Card title="Editor" icon="file-code">
+    A standard CodeMirror editing surface for a source file. This is the default type when you open any file from the explorer or Command Palette.
+  </Card>
+  <Card title="Diff" icon="code-compare">
+    A side-by-side diff view (powered by `@codemirror/merge`) for comparing two versions of a file. Opened automatically when you review a git change.
+  </Card>
+  <Card title="Browser" icon="globe">
+    An in-app web browser tab for previewing local dev servers or documentation without leaving ted.
+  </Card>
+  <Card title="Extensions" icon="puzzle-piece">
+    A tab opened by an installed extension. The content is extension-defined — it could be a dashboard, a visual tool, or anything the extension author provides.
+  </Card>
+</CardGroup>
+
+## Reordering Tabs
+
+Drag any tab left or right along the NavTape to reorder it. ted uses `@dnd-kit` for drag-and-drop, so the reorder animation is smooth and snappy. Drop the tab in the gap between two existing tabs to slot it precisely where you want it.
+
+## Closing Tabs
+
+- **Mouse** — click the **×** icon on the tab.
+- **Keyboard** — press <kbd>Ctrl+W</kbd> / <kbd>Cmd+W</kbd> to close the currently active tab.
+
+<Warning>
+  If the file has unsaved changes (indicated by the **•** dot on the tab label), ted will prompt you to save, discard, or cancel before closing. You will not lose work silently.
+</Warning>
+
+## Dirty State Indicator
+
+A small dot (**•**) appears on the tab label whenever a file has changes that have not been written to disk. The dot disappears as soon as the file is saved — either by pressing <kbd>Ctrl+S</kbd> / <kbd>Cmd+S</kbd> or, if Auto Save is enabled, automatically as you type.
+
+## Split Panes
+
+You can divide the editor area into two independent panes to view or edit two files side by side.
+
+<Steps>
+  <Step title="Drag a tab to the edge">
+    Click and drag any tab toward the **left edge** or **right edge** of the editor area. A blue drop-zone highlight appears to show where the new pane will be created.
+  </Step>
+  <Step title="Release to split">
+    Release the tab when the drop-zone is highlighted. The editor splits into two panes: the dragged file opens in the new pane, and the remaining tabs stay in the original pane.
+  </Step>
+  <Step title="Work in both panes independently">
+    Each pane has its own NavTape and maintains its own active file. You can open, close, scroll, and edit in either pane without affecting the other.
+  </Step>
+  <Step title="Close a pane">
+    Close all tabs in a pane to collapse it back to a single-pane layout.
+  </Step>
+</Steps>
+
+<Tip>
+  Split panes are great for keeping a test file open on one side while editing the implementation on the other, or for referencing documentation in a browser tab while you write code.
+</Tip>
+
+## Workspaces
+
+ted supports multiple **workspace sessions** running concurrently within the same window. Each workspace is fully independent — it has its own open folder, its own set of tabs, and its own terminal session.
+
+Switch between workspaces from the **titlebar area**. You can create a new workspace by opening a different folder, and then toggle back to your original workspace at any time without losing the state of either session.
+
+<Info>
+  Workspace state (open tabs, scroll positions, active file) is persisted between restarts, so you pick up exactly where you left off.
+</Info>
+
+## Keyboard Shortcuts
+
+| Action | Windows / Linux | macOS |
+|---|---|---|
+| Open Command Palette (file search) | `Ctrl+P` | `Cmd+P` |
+| New file | `Ctrl+N` | `Cmd+N` |
+| Save file | `Ctrl+S` | `Cmd+S` |
+| Close active tab | `Ctrl+W` | `Cmd+W` |

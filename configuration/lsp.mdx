@@ -1,0 +1,164 @@
+---
+title: "Language Server Protocol Setup in ted"
+sidebarTitle: "LSP Setup"
+description: "Configure Language Server Protocol support in ted for autocompletion, diagnostics, hover, and go-to-definition across TypeScript, Rust, Python, and C++."
+---
+
+ted integrates Language Server Protocol (LSP) for rich code intelligence — completions, inline diagnostics, hover documentation, and go-to-definition. LSP is enabled by default; as long as the appropriate language server binary is installed on your system, ted picks it up automatically when you open a supported file.
+
+## How LSP Works in ted
+
+When you open a file, ted identifies the language from its extension and spawns the corresponding language server as a child process. The two communicate via JSON-RPC over `stdin`/`stdout` — a standard the LSP specification defines. ted manages the lifecycle of each server process automatically: starting it on first use, feeding it document-change events as you type, and restarting it if it crashes.
+
+<Info>
+LSP servers run locally on your machine. They are separate from the AI assistant — the AI uses the LLM provider you configure under `llm`, while LSP uses language-specific tooling you install yourself.
+</Info>
+
+## LSP Features
+
+| Feature | Description |
+|---|---|
+| **Completions** | Autocomplete suggestions appear as you type, ranked by the language server. |
+| **Diagnostics** | Errors and warnings are underlined inline and listed in the Problems panel. |
+| **Hover** | Hover over any symbol to see its type signature and documentation. |
+| **Go to Definition** | Press `F12` or right-click → Go to Definition to jump to a symbol's declaration. |
+
+## Default Language Servers
+
+ted ships with built-in support for the following language servers. You only need to install the server binary — ted handles the rest.
+
+| Language | Server | Install Command |
+|---|---|---|
+| TypeScript / JavaScript | `typescript-language-server` | `npm install -g typescript-language-server typescript` |
+| Rust | `rust-analyzer` | `rustup component add rust-analyzer` |
+| Python | `pylsp` | `pip install python-lsp-server` |
+| C / C++ | `clangd` | Install via your system package manager |
+
+## Installing Language Servers
+
+<Steps>
+  <Step title="TypeScript and JavaScript">
+    Run the following in your terminal. Both packages are required — `typescript-language-server` is the LSP wrapper and `typescript` provides the compiler it delegates to.
+
+    ```bash
+    npm install -g typescript-language-server typescript
+    ```
+
+    Verify the install:
+
+    ```bash
+    typescript-language-server --version
+    ```
+  </Step>
+
+  <Step title="Rust">
+    `rust-analyzer` ships as a rustup component. Add it to your active toolchain:
+
+    ```bash
+    rustup component add rust-analyzer
+    ```
+  </Step>
+
+  <Step title="Python">
+    Install `python-lsp-server` with pip. It's recommended to install it in whichever Python environment you use for development so it can resolve your project's imports.
+
+    ```bash
+    pip install python-lsp-server
+    ```
+  </Step>
+
+  <Step title="C and C++">
+    Install `clangd` through your system package manager:
+
+    ```bash
+    # macOS (Homebrew)
+    brew install llvm
+
+    # Debian / Ubuntu
+    sudo apt install clangd
+
+    # Fedora
+    sudo dnf install clang-tools-extra
+
+    # Windows (via winget)
+    winget install LLVM.LLVM
+    ```
+  </Step>
+</Steps>
+
+## Enabling and Disabling LSP
+
+LSP is controlled by the `lsp.enabled` key in your settings. To disable all language servers globally, set it to `false` in `~/.config/ted/settings.json`:
+
+```json
+{
+  "lsp": {
+    "enabled": false
+  }
+}
+```
+
+You can also disable a single language server while leaving the others running — see [Disabling a Specific Server](#disabling-a-specific-server) below.
+
+## Custom Server Configuration
+
+ted's built-in server configurations work for most projects. If you need to override the command, arguments, or enabled state for a language, add a `lsp.servers` block to your settings:
+
+```json
+{
+  "lsp": {
+    "enabled": true,
+    "servers": {
+      "typescript": {
+        "command": "typescript-language-server",
+        "args": ["--stdio"],
+        "enabled": true
+      },
+      "rust": {
+        "command": "rust-analyzer",
+        "args": [],
+        "enabled": true
+      }
+    }
+  }
+}
+```
+
+Each key under `servers` maps to a language identifier. The value has three fields:
+
+| Field | Type | Description |
+|---|---|---|
+| `command` | `string` | The executable to run. Must be on your `PATH` or an absolute path. |
+| `args` | `string[]` | Command-line arguments passed to the server. Most servers require `["--stdio"]`. |
+| `enabled` | `boolean` | Whether to start this server. Omit or set to `true` to enable. |
+
+<Tip>
+Project-level settings are a great place for custom LSP configs. Add your `lsp.servers` block to `<project-folder>/.ted/settings.json` to keep per-project server settings isolated from your global config.
+</Tip>
+
+## Disabling a Specific Server
+
+Set `enabled: false` for a language key to stop ted from starting that server, without affecting others:
+
+```json
+{
+  "lsp": {
+    "enabled": true,
+    "servers": {
+      "python": {
+        "command": "pylsp",
+        "args": [],
+        "enabled": false
+      }
+    }
+  }
+}
+```
+
+## Server Crash Recovery
+
+If a language server process exits unexpectedly, ted detects the crash and attempts to restart it automatically. If restarts keep failing, check the DevTools console (right-click anywhere in the ted window → **Inspect** → **Console**) for error output from the server process.
+
+<Warning>
+Some language servers print diagnostic output to `stderr` that is separate from LSP messages. ted does not surface this in the UI — the DevTools console is the best place to look when a server misbehaves.
+</Warning>

@@ -1,0 +1,86 @@
+---
+title: "Extend ted with Custom Extensions and the TedAPI"
+sidebarTitle: "Overview"
+description: "ted's extension system lets you add commands, sidebar panels, status bar items, and custom file icons using plain JavaScript and the TedAPI."
+---
+
+ted supports a first-party extension system — write an extension in plain JavaScript, place it in your extensions folder, and ted loads it at startup. No build pipeline, no compilation step, and no package manager required. Every extension gets access to the same `TedAPI` surface that ted's own built-in panels use, so you can reach deep into the editor from day one.
+
+## How extensions work
+
+Each extension lives in its own folder inside `~/.config/ted/extensions/`. When ted starts, the `ExtensionHost` scans that directory, reads each `manifest.json`, and activates any extension whose `activationEvents` match the current context. Extensions are loaded dynamically via Blob URLs, which means a plain `.js` file is all you need to get started.
+
+```
+~/.config/ted/extensions/
+└── my-extension/
+    ├── manifest.json
+    └── index.js
+```
+
+<Info>
+  The Extensions marketplace panel is accessible from the sidebar and lets you browse, install, and manage extensions without touching the filesystem directly. The marketplace is currently in **alpha** and the available catalogue is growing.
+</Info>
+
+## What extensions can do
+
+Extensions interact with ted through the `TedAPI` object passed to their `activate` function. Here's a quick overview of every integration point available to you.
+
+<CardGroup cols={2}>
+  <Card title="Custom Commands" icon="terminal">
+    Register commands that appear in the Command Palette. Commands can be triggered by the user or called programmatically by other parts of your extension.
+  </Card>
+  <Card title="Sidebar Panels" icon="sidebar">
+    Mount a fully custom HTML view into the ted sidebar. You control the DOM inside the panel container — use it to show trees, lists, forms, or anything else.
+  </Card>
+  <Card title="Status Bar Items" icon="bars">
+    Add text labels or clickable buttons to the bottom status bar. Items can be placed on the left or right and updated at any time in response to editor events.
+  </Card>
+  <Card title="File Icon Providers" icon="file">
+    Return an emoji or icon string for any file or directory path shown in the explorer tree. Multiple providers can be registered; ted uses the first non-`undefined` result.
+  </Card>
+  <Card title="File System Access" icon="folder-open">
+    Read files, write files, and list directory contents through `api.fs`. Paths are absolute, so you can reach anywhere on the local filesystem the user has permission to access.
+  </Card>
+  <Card title="Open Files in the Editor" icon="code">
+    Call `api.editor.openFile(path)` to open any file in the main editor view. Pair it with `getActiveFile()` to inspect the currently open document's path, name, and full text content.
+  </Card>
+  <Card title="Editor Event Listeners" icon="bolt">
+    Subscribe to ted's internal events (such as `fileChanged`) via `api.onEvent`. The call returns an unsubscribe function you should invoke in `deactivate()` for clean teardown.
+  </Card>
+  <Card title="Quick Pick & Input Dialogs" icon="window">
+    Prompt the user with a searchable dropdown (`showQuickPick`) or a freeform text input (`showInputBox`) — the same UI primitives ted uses for its own Command Palette.
+  </Card>
+</CardGroup>
+
+## Extension lifecycle
+
+Ted calls your exported `activate(api)` function once when the extension is loaded, passing the full `TedAPI` object. Everything you register inside `activate` — commands, panels, status bar items, icon providers — is tracked by ted's `ExtensionCleanup` mechanism and removed automatically when the extension is unloaded or ted shuts down.
+
+```javascript
+// index.js — minimal lifecycle skeleton
+export function activate(api) {
+  // Register anything you need here.
+  // api is the full TedAPI object.
+}
+
+export function deactivate() {
+  // Called when the extension is unloaded.
+  // Most cleanup is automatic, but cancel any
+  // timers or event subscriptions you set up manually.
+}
+```
+
+<Note>
+  Exporting `deactivate` is optional. Ted will still unload your extension and clean up all registered resources if you omit it. You only need `deactivate` if you set up resources outside of the TedAPI — for example, a `setInterval` or a raw `addEventListener` on the DOM.
+</Note>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Installing Extensions" icon="download" href="/extensions/installing">
+    Install an extension manually or from the marketplace, and walk through creating your first extension from scratch.
+  </Card>
+  <Card title="API Reference" icon="book" href="/extensions/api-reference">
+    Complete reference for every namespace in the TedAPI: method signatures, parameters, return types, and usage notes.
+  </Card>
+</CardGroup>

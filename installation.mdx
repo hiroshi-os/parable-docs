@@ -1,0 +1,136 @@
+---
+title: "Install ted on macOS, Linux, and Windows"
+sidebarTitle: "Installation"
+description: "Step-by-step instructions to install ted on macOS, Linux, and Windows. Requires Bun, Rust, and Tauri system dependencies."
+---
+
+ted is a [Tauri 2](https://tauri.app) desktop application. Because ted is currently in alpha, there are no pre-built binaries or installers available yet — you'll build it from source using the steps below. The process takes about 10–15 minutes on a first run (mostly Rust compilation) and just a few seconds on subsequent runs.
+
+<Note>
+  ted is at version **0.4.0-alpha**. Features may change between releases and some planned capabilities are not yet implemented. Expect rough edges and check the repository for the latest updates.
+</Note>
+
+## Prerequisites
+
+You need three things on your system before you can build ted: the Bun runtime, a Rust toolchain, and the platform-specific system libraries that Tauri requires.
+
+### Bun
+
+ted uses [Bun](https://bun.sh) as its JavaScript runtime, package manager, and dev runner.
+
+```bash
+# macOS and Linux
+curl -fsSL https://bun.sh/install | bash
+
+# Windows (PowerShell)
+powershell -c "irm bun.sh/install.ps1 | iex"
+```
+
+Verify the installation:
+
+```bash
+bun --version
+```
+
+### Rust toolchain
+
+Tauri 2 requires a Rust toolchain. Install it via [rustup](https://rustup.rs):
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+After installation, make sure the `cargo` and `rustc` binaries are on your `PATH` (rustup will prompt you to restart your shell or source the env file).
+
+```bash
+rustc --version
+cargo --version
+```
+
+### Tauri v2 system dependencies
+
+Tauri requires a set of native system libraries that vary by platform. Follow the official Tauri prerequisites guide for your OS: [tauri.app/start/prerequisites](https://tauri.app/start/prerequisites/)
+
+Quick reference by platform:
+
+**macOS** — Install Xcode Command Line Tools:
+
+```bash
+xcode-select --install
+```
+
+**Linux** — Install WebKit2GTK, libssl, and related packages. The exact package names depend on your distribution. For Ubuntu/Debian:
+
+```bash
+sudo apt update
+sudo apt install libwebkit2gtk-4.1-dev libssl-dev libgtk-3-dev \
+  libayatana-appindicator3-dev librsvg2-dev
+```
+
+For other distributions (Arch, Fedora, NixOS, etc.), refer to the [Tauri Linux prerequisites page](https://tauri.app/start/prerequisites/).
+
+**Windows** — You need two things:
+- **Microsoft Visual Studio C++ Build Tools** — install from the [Visual Studio Build Tools page](https://visualstudio.microsoft.com/visual-cpp-build-tools/), selecting the "Desktop development with C++" workload.
+- **WebView2** — typically pre-installed on Windows 10 (1803+) and Windows 11. If it's missing, download it from [Microsoft's WebView2 page](https://developer.microsoft.com/en-us/microsoft-edge/webview2/).
+
+## Installation steps
+
+<Steps>
+  <Step title="Clone the repository">
+    Clone the ted source repository and move into the project directory:
+
+    ```bash
+    git clone https://github.com/hiroshi-os/Parable.git && cd Parable
+    ```
+  </Step>
+  <Step title="Install JavaScript dependencies">
+    Use Bun to install all JavaScript and TypeScript dependencies:
+
+    ```bash
+    bun install
+    ```
+
+    This step is fast — Bun resolves and links packages in seconds.
+  </Step>
+  <Step title="Run ted in development mode">
+    Start the Tauri development server. This compiles the Rust backend, starts the Vite dev server for the frontend, and opens the ted window:
+
+    ```bash
+    bun tauri dev
+    ```
+
+    <Note>
+      The first run will take several minutes while Rust compiles the Tauri backend and its dependencies. Subsequent runs are much faster because Rust caches compiled artifacts.
+    </Note>
+
+    Once the build completes, ted opens as a frameless window at **1200×800** pixels.
+  </Step>
+  <Step title="(Optional) Build a production binary">
+    To produce a standalone, optimized binary for distribution or daily use, run:
+
+    ```bash
+    bun run build && bun tauri build
+    ```
+
+    The output binary and installer will be placed in `src-tauri/target/release/bundle/` in a subdirectory for your platform (e.g., `dmg` on macOS, `deb`/`AppImage` on Linux, `msi`/`exe` on Windows).
+  </Step>
+</Steps>
+
+## Verifying the installation
+
+When ted launches successfully, you'll see the Welcome screen inside the frameless 1200×800 window. From there you can open a folder and start exploring. If the window doesn't appear, check your terminal output for Rust or system dependency errors.
+
+<Tip>
+  If you see a WebKit-related error on Linux, double-check that you have the correct version of WebKit2GTK installed for your distribution. Tauri 2 requires `libwebkit2gtk-4.1` on most modern distros.
+</Tip>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Open your first project, run an AI agent, and explore git history in 5 minutes.
+  </Card>
+  <Card title="AI Agents" icon="robot" href="/agents/overview">
+    Learn how to connect an LLM provider and run agents on your code.
+  </Card>
+</CardGroup>

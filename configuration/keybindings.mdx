@@ -1,0 +1,90 @@
+---
+title: "Keyboard Shortcuts Reference for ted"
+sidebarTitle: "Keybindings"
+description: "Complete keyboard shortcuts reference for ted: file operations, navigation, editor actions, terminal, git, and the command palette."
+---
+
+ted is designed for keyboard-first workflows — nearly every action you perform regularly has a dedicated shortcut. Below is a complete reference organized by category. On macOS, substitute `Cmd` wherever you see `Ctrl`.
+
+## Files
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl+S` / `Cmd+S` | Save the current file |
+| `Ctrl+W` / `Cmd+W` | Close the current tab |
+| `Ctrl+N` / `Cmd+N` | Create a new untitled file |
+| `Ctrl+O` / `Cmd+O` | Open a folder in ted |
+
+<Note>
+`Ctrl+O` opens a **folder**, not a single file. ted is workspace-oriented — opening a folder gives you the full sidebar, git integration, and project-level settings.
+</Note>
+
+## Navigation
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl+P` / `Cmd+P` | Open the Command Palette (also acts as a quick file switcher) |
+| `Ctrl+,` / `Cmd+,` | Open Settings |
+
+## Editor
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl+F` / `Cmd+F` | Find in current file |
+| `Ctrl+H` / `Cmd+H` | Find and replace in current file |
+| `Ctrl+/` / `Cmd+/` | Toggle line comment |
+
+<Info>
+Find, replace, and comment toggling are handled by CodeMirror's built-in command system. The exact behavior may vary slightly depending on the language mode active in the editor.
+</Info>
+
+## Terminal
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl+\`` / `Cmd+\`` | Toggle the integrated terminal panel |
+
+## Git / Source Control
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl+Enter` / `Cmd+Enter` | Commit staged changes (when focus is in the commit message input) |
+
+## CodeMirror Editor Shortcuts
+
+The ted editor is built on CodeMirror, which provides a set of standard editing shortcuts in addition to ted's own:
+
+| Shortcut | Action |
+|---|---|
+| `Home` | Move cursor to start of line |
+| `End` | Move cursor to end of line |
+| `Ctrl+Home` / `Cmd+Home` | Jump to top of file |
+| `Ctrl+End` / `Cmd+End` | Jump to bottom of file |
+| `Alt+Up` / `Alt+Down` | Move the current line up or down |
+| `Shift+Alt+Up` / `Shift+Alt+Down` | Duplicate the current line |
+| `Ctrl+D` / `Cmd+D` | Select next occurrence of the current selection |
+| `Ctrl+A` / `Cmd+A` | Select all |
+| `Tab` | Indent selection |
+| `Shift+Tab` | Unindent selection |
+
+<Tip>
+Use the **Command Palette** (`Ctrl+P` / `Cmd+P`) as a searchable shortcut reference. Type any action name — for example "save", "theme", or "terminal" — to find and run it without remembering the exact key combination.
+</Tip>
+
+## Quick Reference Card
+
+Here's the full set of ted-defined shortcuts at a glance:
+
+| Shortcut (Win/Linux) | Shortcut (macOS) | Action |
+|---|---|---|
+| `Ctrl+S` | `Cmd+S` | Save file |
+| `Ctrl+W` | `Cmd+W` | Close tab |
+| `Ctrl+N` | `Cmd+N` | New file |
+| `Ctrl+O` | `Cmd+O` | Open folder |
+| `Ctrl+P` | `Cmd+P` | Command palette |
+| `Ctrl+,` | `Cmd+,` | Settings |
+| `Ctrl+F` | `Cmd+F` | Find in file |
+| `Ctrl+H` | `Cmd+H` | Find and replace |
+| `Ctrl+/` | `Cmd+/` | Toggle comment |
+| `Ctrl+\`` | `Cmd+\`` | Toggle terminal |
+| `Ctrl+Enter` | `Cmd+Enter` | Commit (Source Control) |

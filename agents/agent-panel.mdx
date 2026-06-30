@@ -1,0 +1,110 @@
+---
+title: "Using the Agent Panel to Chat with Your AI"
+sidebarTitle: "Agent Panel"
+description: "How to open and use the ted Agent Panel: send instructions, view tool traces, manage conversation history, and understand agent responses."
+---
+
+The Agent Panel is your conversation interface with the AI agent inside ted. From here you send instructions in plain language, watch the agent call tools in real time, review a full trace of every action it took, and build up a persistent conversation history — all without switching to a separate app or terminal window.
+
+## Opening the Agent Panel
+
+You can open the Agent Panel two ways:
+
+- **Sidebar icon** — click the robot icon in the left sidebar
+- **Command Palette** — press `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (macOS), then type **Agent** and select "Open Agent Panel"
+
+The panel appears as a resizable sidebar column. You can drag the divider to give it more horizontal space when reviewing long traces.
+
+## Sending a Message
+
+Type your instruction in the input box at the bottom of the panel and press **Enter** to send. You can reference specific files directly in your message using `@filename` syntax — start typing `@` and ted will show a list of files in your workspace to autocomplete.
+
+```
+@src/auth/login.ts Add input validation for the email field
+```
+
+<Tip>
+  Be specific about what you want changed and where. Mentioning a filename with `@` gives the agent an immediate starting point — it will read that file as its first tool call rather than searching for it.
+</Tip>
+
+For multi-line instructions, use `Shift+Enter` to add a line break in the input box without sending.
+
+## Understanding the Response
+
+After you send a message, the agent begins its reasoning loop. You'll see activity in the panel before the final reply arrives:
+
+1. **Thinking indicator** — a spinner shows the agent is processing
+2. **Trace entries** — each tool call appears as a collapsible row as it happens (e.g., `read_file`, `edit_file`, `run_terminal_cmd`)
+3. **Final reply** — once the agent finishes its loop, it writes a plain-language summary of what it did
+
+### Reading Trace Entries
+
+Click any trace entry to expand it and see the full details:
+
+- **Tool name** — which tool was called (e.g., `grep`, `edit_file`)
+- **Arguments** — the exact parameters passed to the tool
+- **Result** — the output returned (file contents, command output, search results, etc.)
+
+<Info>
+  Traces are your audit log. If the agent made an unexpected change, expand the `edit_file` trace to see exactly which lines were written and why.
+</Info>
+
+## Inline Suggestions
+
+When you haven't typed anything for approximately **5 seconds**, ted's `LLMAgent` passively analyzes the current file and your recent editing context. If it has a relevant suggestion, it appears as a **toast notification** in the bottom-right corner of the editor.
+
+| Action | Result |
+|---|---|
+| **Accept** | Applies the suggested code at your cursor position |
+| **Dismiss** | Closes the toast without making any changes |
+
+Inline suggestions are generated from file content, AST structure, git history, and recent cursor activity — they're not random completions, but contextual drafts based on what you appear to be writing next.
+
+## Conversation History
+
+The Agent Panel maintains a running history of your entire session. Earlier messages and the agent's responses scroll upward as the conversation grows. The history is preserved across file switches and panel toggles within a session.
+
+To clear the conversation history:
+
+<Steps>
+  <Step title="Open the panel menu">
+    Click the **⋯** (more options) icon in the top-right corner of the Agent Panel.
+  </Step>
+  <Step title="Select Clear History">
+    Choose **Clear History** from the dropdown. This resets the conversation context — the agent will no longer have access to previous messages.
+  </Step>
+</Steps>
+
+<Warning>
+  Clearing history is irreversible within the session. If the agent is partway through a multi-step task, clearing history may cause it to lose context about what it has already done.
+</Warning>
+
+## Example Usage Scenarios
+
+Here are some instructions you can send directly to the agent:
+
+<CardGroup cols={2}>
+  <Card title="Refactor Code" icon="arrows-rotate">
+    `"Refactor this function to use async/await instead of callbacks"`
+  </Card>
+  <Card title="Search Codebase" icon="magnifying-glass">
+    `"Find all usages of getUserById across the codebase"`
+  </Card>
+  <Card title="Write Tests" icon="flask">
+    `"Write unit tests for all exported functions in @src/auth/auth.ts"`
+  </Card>
+  <Card title="Browse the Web" icon="globe">
+    `"Open the GitHub issues page for this repo and summarize the top open issues"`
+  </Card>
+</CardGroup>
+
+Other things you can ask:
+
+- `"Explain what @src/services/payment.ts does"`
+- `"Add JSDoc comments to every exported function in @src/utils/format.ts"`
+- `"Run the test suite and tell me which tests are failing"`
+- `"What did you just do?"` — asks the agent to explain its last set of tool calls in plain English
+
+<Warning>
+  The agent has access to your local filesystem and can execute terminal commands. Review tool traces carefully, especially for tasks involving `edit_file`, `delete_file`, or `run_terminal_cmd`. You can always undo file changes with `Ctrl+Z` / `Cmd+Z` in the editor.
+</Warning>

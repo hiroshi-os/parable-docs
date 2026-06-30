@@ -1,0 +1,141 @@
+---
+title: "Install and Create ted Extensions"
+sidebarTitle: "Installing"
+description: "How to install a ted extension from the marketplace or manually, and how to create your first extension with a manifest and JavaScript entry file."
+---
+
+Extensions are installed by placing a folder in the ted extensions directory — there is no installer, registry command, or package manager involved. If the folder contains a valid `manifest.json` and a JavaScript entry file, ted picks it up automatically on the next startup.
+
+## Installing manually
+
+<Steps>
+  <Step title="Locate the extensions directory">
+    Ted loads extensions from `~/.config/ted/extensions/`. Create the directory if it doesn't exist yet.
+
+    ```bash
+    mkdir -p ~/.config/ted/extensions
+    ```
+  </Step>
+  <Step title="Place your extension folder inside">
+    Each extension is a self-contained folder. Copy or move it into the extensions directory.
+
+    ```bash
+    cp -r my-extension ~/.config/ted/extensions/
+    ```
+
+    After the copy, your layout should look like this:
+
+    ```
+    ~/.config/ted/extensions/
+    └── my-extension/
+        ├── manifest.json
+        └── index.js
+    ```
+  </Step>
+  <Step title="Verify the folder contents">
+    The folder must contain at minimum:
+    - A `manifest.json` file with the required fields (`name`, `version`, `displayName`, `main`)
+    - The JavaScript entry file referenced by `manifest.json`'s `main` field
+
+    Missing either file will cause ted to skip the extension silently.
+  </Step>
+  <Step title="Restart ted (or reload via the Extensions panel)">
+    Ted discovers extensions at startup. Restart the editor, or — if you have the Extensions panel open — use the **Reload** button to re-scan the extensions directory without a full restart.
+  </Step>
+</Steps>
+
+## Using the Marketplace panel
+
+The Extensions marketplace gives you a graphical way to browse and install community extensions without touching the filesystem.
+
+<Steps>
+  <Step title="Open the Extensions panel">
+    Click the **Extensions** icon in the ted sidebar. The panel lists available extensions from the marketplace catalogue.
+
+    <Info>
+      The marketplace is currently in **alpha**. The catalogue is growing — if you don't find what you need, install the extension manually or build your own.
+    </Info>
+  </Step>
+  <Step title="Browse and install">
+    Search or scroll to find an extension, then click **Install**. Ted downloads the extension folder directly into `~/.config/ted/extensions/` and activates it immediately — no restart required.
+  </Step>
+  <Step title="Manage installed extensions">
+    Installed extensions appear in the **Installed** tab. From there you can disable, reload, or uninstall any extension with a single click.
+  </Step>
+</Steps>
+
+---
+
+## Creating your first extension
+
+The fastest way to understand how extensions work is to build a small one. This example registers a single command that shows a greeting notification when you run it from the Command Palette.
+
+### 1. Create the extension folder
+
+```bash
+mkdir -p ~/.config/ted/extensions/hello-ted
+```
+
+### 2. Write the manifest
+
+Create `~/.config/ted/extensions/hello-ted/manifest.json`:
+
+```json
+{
+  "name": "hello-ted",
+  "version": "1.0.0",
+  "displayName": "Hello ted",
+  "description": "A minimal ted extension example",
+  "main": "index.js",
+  "activationEvents": ["onStartup"]
+}
+```
+
+### 3. Write the entry file
+
+Create `~/.config/ted/extensions/hello-ted/index.js`:
+
+```javascript
+export function activate(api) {
+  api.commands.register(
+    "sayHello",
+    "Hello: Greet the User",
+    () => api.editor.showNotification("Hello from my extension!", "info")
+  );
+}
+
+export function deactivate() {
+  // optional cleanup — ted handles command deregistration automatically
+}
+```
+
+### 4. Try it out
+
+Restart ted, then open the Command Palette and run **"Hello: Greet the User"**. You should see a blue info notification appear in the top-right corner of the editor.
+
+<Tip>
+  The command label (second argument to `api.commands.register`) is what users see in the Command Palette. Use a short, descriptive prefix that identifies your extension — for example, `"Hello: …"` — so related commands group together visually.
+</Tip>
+
+---
+
+## `activationEvents` reference
+
+The `activationEvents` array in your manifest controls when ted loads your extension. Lazy activation keeps startup fast for users who haven't triggered your extension yet.
+
+| Event | When it fires |
+|---|---|
+| `"onStartup"` | Immediately when ted finishes launching. Use this for extensions that need to be active from the start (e.g., status bar items, passive event listeners). |
+| `"onCommand:myCmd"` | The first time the user invokes the command with that ID. Use this to defer activation until the extension is actually needed. |
+
+<Note>
+  You can list multiple activation events. Ted activates your extension as soon as **any** of them fire. Once activated, the extension stays active for the rest of the session — it won't be re-activated by subsequent matching events.
+</Note>
+
+---
+
+## Security considerations
+
+<Warning>
+  Extensions run in the same renderer process as ted. They have full access to the DOM, the Node.js APIs available in that context, and the network via `fetch`. Only install extensions from sources you trust. Treat a third-party extension with the same scrutiny you would give any executable code running on your machine.
+</Warning>

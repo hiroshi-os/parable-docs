@@ -1,0 +1,295 @@
+---
+title: "Agent Tools Reference: Files, Shell, and Browser"
+sidebarTitle: "Tools"
+description: "Complete reference for all 17 tools available to the ted AI agent: file operations, codebase search, terminal commands, and browser automation."
+---
+
+The ted agent has access to a set of tools it calls automatically during its reasoning loop. You never invoke these tools directly — the agent chooses which ones to use based on your instructions. Understanding what each tool does, what arguments it accepts, and when the agent reaches for it will help you write better prompts and make sense of the traces you see in the Agent Panel.
+
+Tools are grouped into four categories: **File**, **Search**, **Shell**, and **Browser**.
+
+---
+
+## File Tools
+
+These tools let the agent read, write, and navigate your local filesystem.
+
+### `read_file`
+
+Reads the contents of a file and returns it with line numbers. Supports paginated reads for large files.
+
+<ParamField path="target_file" type="string" required>
+  Path to the file to read, relative to the workspace root.
+</ParamField>
+<ParamField path="offset" type="number">
+  Line number to start reading from. Defaults to the beginning of the file.
+</ParamField>
+<ParamField path="limit" type="number">
+  Maximum number of lines to return. Useful for skimming large files.
+</ParamField>
+
+**Example scenario:** You ask the agent to "explain what `authMiddleware` does." The agent calls `read_file` on `src/middleware/auth.ts` to retrieve the source before generating an explanation.
+
+---
+
+### `list_dir`
+
+Lists the contents of a directory — files and subdirectories — one entry per line.
+
+<ParamField path="target_directory" type="string" required>
+  Path to the directory to list, relative to the workspace root.
+</ParamField>
+
+**Example scenario:** When you ask the agent to "add an index file to the utils folder," it calls `list_dir` on `src/utils/` first to see what already exists.
+
+---
+
+### `edit_file`
+
+Writes content to a file, creating it if it doesn't exist or updating it if it does. This is how the agent makes all code changes.
+
+<ParamField path="target_file" type="string" required>
+  Path to the file to create or modify.
+</ParamField>
+<ParamField path="code_edit" type="string" required>
+  The new file content or partial edit. Supports the `// ... existing code ...` marker to preserve unchanged sections.
+</ParamField>
+
+#### The `// ... existing code ...` marker
+
+The agent uses this special comment to make **surgical edits** — changing only a specific section of a file while leaving the rest intact. This keeps traces readable and avoids rewriting hundreds of lines unnecessarily.
+
+```typescript
+// ... existing code ...
+
+export async function fetchUser(id: string): Promise<User> {
+  const response = await fetch(`/api/users/${id}`);
+  if (response.status === 404) {
+    throw new UserNotFoundError(id);
+  }
+  return response.json();
+}
+
+// ... existing code ...
+```
+
+In this example, ted replaces only the `fetchUser` function body while preserving everything above and below it.
+
+**Example scenario:** You ask the agent to "add error handling to `fetchUser`." The agent reads the file, identifies the function, then calls `edit_file` with just that function wrapped in `// ... existing code ...` markers.
+
+---
+
+### `delete_file`
+
+Permanently deletes a file from the filesystem.
+
+<ParamField path="target_file" type="string" required>
+  Path to the file to delete.
+</ParamField>
+
+<Warning>
+  Deletion is immediate and not undoable through the agent. Only ask the agent to delete files you're confident you no longer need.
+</Warning>
+
+---
+
+### `file_search`
+
+Finds files in the workspace that match a glob pattern.
+
+<ParamField path="glob_pattern" type="string" required>
+  A glob pattern such as `**/*.test.ts` or `src/components/**/*.tsx`.
+</ParamField>
+
+**Example scenario:** You ask the agent to "find all test files in the project." It calls `file_search` with `**/*.test.ts` and returns the full list of matches.
+
+---
+
+## Search Tools
+
+These tools let the agent search through your codebase by pattern or by meaning.
+
+### `grep`
+
+Runs a ripgrep pattern search across your workspace (or a specific path) and returns matching lines with file paths and line numbers.
+
+<ParamField path="pattern" type="string" required>
+  A regular expression or literal string to search for.
+</ParamField>
+<ParamField path="path" type="string">
+  Optional directory or file path to scope the search. Defaults to the entire workspace.
+</ParamField>
+
+**Example scenario:** You ask the agent to "find everywhere we call `sendEmail`." It runs `grep` with the pattern `sendEmail` to locate every call site.
+
+---
+
+### `codebase_search`
+
+A semantic-style search that uses ripgrep under the hood but is optimized for natural-language queries across one or more directories. Good for answering "where does X happen?" questions.
+
+<ParamField path="query" type="string" required>
+  A natural-language or keyword query describing what you're looking for.
+</ParamField>
+<ParamField path="target_directories" type="string[]">
+  Optional list of directories to search within. Defaults to the entire workspace.
+</ParamField>
+
+**Example scenario:** You ask the agent to "find where user authentication tokens are validated." It calls `codebase_search` with `"token validation"` to surface the most relevant files.
+
+---
+
+## Shell Tools
+
+These tools give the agent the ability to execute commands and schedule work over time.
+
+### `run_terminal_cmd`
+
+Executes a shell command in the workspace root and returns its `stdout` and `stderr`. Commands run in the same environment as your terminal.
+
+<ParamField path="command" type="string" required>
+  The shell command to run (e.g., `npm test`, `git log --oneline -10`).
+</ParamField>
+<ParamField path="timeout" type="number">
+  Timeout in seconds. If the command hasn't finished by then, it continues running in the background and returns a **PID** you can poll with `check_background_cmd`.
+</ParamField>
+
+**Example scenario:** You ask the agent to "run the test suite and tell me what's failing." It calls `run_terminal_cmd` with `npm test`, captures the output, and summarizes which tests failed.
+
+<Note>
+  Long-running commands (like dev servers or build watchers) that exceed the timeout are moved to the background. The agent receives a PID and can check on them later using `check_background_cmd`.
+</Note>
+
+---
+
+### `check_background_cmd`
+
+Polls the status and output of a previously backgrounded command.
+
+<ParamField path="pid" type="number" required>
+  The process ID returned by a previous `run_terminal_cmd` call that timed out.
+</ParamField>
+
+**Example scenario:** The agent starts a build with a short timeout. When it times out, it stores the PID, does some other work, then calls `check_background_cmd` to see whether the build finished.
+
+---
+
+### `schedule_request`
+
+Schedules a message to be sent back to the agent after a delay. Useful for tasks where the agent needs to wait for something — a build, a server startup, an API response — before taking the next action.
+
+<ParamField path="delay_seconds" type="number" required>
+  How many seconds to wait before delivering the message.
+</ParamField>
+<ParamField path="message" type="string" required>
+  The message to deliver to the agent after the delay.
+</ParamField>
+
+**Example scenario:** The agent starts a dev server, then calls `schedule_request` with a 5-second delay and the message "Check if the dev server is running on port 3000" to verify it started successfully.
+
+---
+
+## Browser Tools
+
+These tools give the agent control of a real browser window running on your machine. They let the agent open pages, interact with UI elements, and read page content — enabling tasks like researching documentation, filling out forms, or reading live app state.
+
+<Warning>
+  Browser tools open **real browser windows** on your machine and can interact with any website. They are not sandboxed. Review agent traces carefully whenever browser tools are in use, especially if the agent is clicking buttons or typing into forms.
+</Warning>
+
+### `browser_open`
+
+Opens a URL in a controlled browser window and assigns it a label for subsequent interactions.
+
+<ParamField path="url" type="string" required>
+  The fully-qualified URL to open (e.g., `https://github.com/your-org/your-repo/issues`).
+</ParamField>
+
+---
+
+### `browser_click`
+
+Clicks a DOM element identified by a CSS selector.
+
+<ParamField path="label" type="string" required>
+  The label of the browser window (assigned when the window was opened).
+</ParamField>
+<ParamField path="selector" type="string" required>
+  A CSS selector identifying the element to click (e.g., `button.submit`, `#login-btn`).
+</ParamField>
+
+---
+
+### `browser_type`
+
+Types text into an input field or textarea.
+
+<ParamField path="label" type="string" required>
+  The label of the browser window.
+</ParamField>
+<ParamField path="selector" type="string" required>
+  CSS selector for the input element.
+</ParamField>
+<ParamField path="text" type="string" required>
+  The text to type into the element.
+</ParamField>
+
+---
+
+### `browser_scroll`
+
+Scrolls a DOM element into the viewport.
+
+<ParamField path="label" type="string" required>
+  The label of the browser window.
+</ParamField>
+<ParamField path="selector" type="string" required>
+  CSS selector for the element to scroll into view.
+</ParamField>
+
+---
+
+### `browser_hover`
+
+Moves the mouse cursor over a DOM element (useful for triggering hover states or tooltips).
+
+<ParamField path="label" type="string" required>
+  The label of the browser window.
+</ParamField>
+<ParamField path="selector" type="string" required>
+  CSS selector for the element to hover over.
+</ParamField>
+
+---
+
+### `browser_read`
+
+Reads and returns the visible text content of the current page body.
+
+<ParamField path="label" type="string" required>
+  The label of the browser window to read from.
+</ParamField>
+
+**Example scenario:** After navigating to a GitHub issues page, the agent calls `browser_read` to capture the list of open issues, then summarizes them for you.
+
+---
+
+### `browser_close`
+
+Closes a browser window opened by a previous `browser_open` call.
+
+<ParamField path="label" type="string" required>
+  The label of the browser window to close.
+</ParamField>
+
+---
+
+## Tips for Working with Tools
+
+<Tip>
+  After the agent finishes a task, ask **"What did you just do?"** — the agent will walk you through every tool it called in plain English, which is a great way to build intuition for how it approaches different problems.
+</Tip>
+
+<Tip>
+  You can steer the agent toward or away from specific tools in your prompt. For example: "Without running any terminal commands, explain what this function does" or "Use `grep` to find all the places we import from `utils`."
+</Tip>

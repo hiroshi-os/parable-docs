@@ -1,0 +1,103 @@
+---
+title: "ted Interface Overview: Sidebar, Editor, and Terminal"
+sidebarTitle: "Interface"
+description: "A visual tour of the ted interface: sidebar panels, editor area, terminal, command palette, and the Swarms multi-agent view."
+---
+
+ted arranges its workspace into three primary regions: a narrow icon sidebar on the left, the editor area in the center, and an optional terminal panel that slides up from the bottom. Every region is designed to stay out of your way until you need it — the frameless window and minimal chrome keep your code front and center at all times.
+
+## Sidebar
+
+The sidebar is a vertical icon rail docked to the left edge of the window. Clicking an icon expands the corresponding panel; clicking the same icon again collapses it.
+
+<CardGroup cols={2}>
+  <Card title="File Explorer" icon="folder-open">
+    Browse, open, create, rename, and delete files and folders in your current workspace. The tree reflects the folder you opened when starting the session.
+  </Card>
+  <Card title="Source Control" icon="code-branch">
+    View staged and unstaged changes, write commit messages, and interact with your local git repository without leaving the editor.
+  </Card>
+  <Card title="Search" icon="magnifying-glass">
+    Run a full-text search across every file in the workspace. Supports plain text and regular expressions, with real-time result previews.
+  </Card>
+  <Card title="Agent" icon="robot">
+    Open the AI agent panel to send instructions, review agent output, and track the actions the agent takes on your codebase.
+  </Card>
+  <Card title="Extensions" icon="puzzle-piece">
+    Browse and manage installed extensions that add new languages, tools, or integrations to ted.
+  </Card>
+  <Card title="Settings" icon="gear">
+    Open the Settings popup directly from the sidebar. The same popup is also accessible with <kbd>Ctrl+,</kbd> / <kbd>Cmd+,</kbd>.
+  </Card>
+</CardGroup>
+
+## Editor Area
+
+The editor area occupies the main body of the window and consists of two sub-components: the **NavTape** tab bar at the top and the **CodeMirror editor pane** below it.
+
+### NavTape (Tab Bar)
+
+The NavTape is the horizontal strip that lists every open file as a tab. Each tab shows the filename and a dirty-state indicator (a dot **•**) when the file has unsaved changes. You can reorder tabs by dragging them left or right along the strip.
+
+### CodeMirror Editor Pane
+
+The editor itself is powered by [CodeMirror 6](https://codemirror.net/), a highly extensible browser-based editing engine. Out of the box you get:
+
+- **Syntax highlighting** — driven by web-tree-sitter grammars running in a background Web Worker.
+- **Indentation guides** — subtle vertical lines that mark indentation levels inside your code.
+- **Line numbers** — displayed in the left margin; toggleable in **Settings → Editor → Line Numbers**.
+- **Git gutter** — a thin column between the line numbers and your code that shows `+` (added) and `~` (modified) markers for lines that differ from the last git commit.
+- **Git blame** — an inline ghost text annotation on the current line that shows the commit author and date.
+
+## Terminal Panel
+
+The integrated terminal gives you a full PTY session (bash on macOS/Linux, PowerShell on Windows) without switching to a separate app.
+
+<Steps>
+  <Step title="Toggle the terminal">
+    Press <kbd>Ctrl+`</kbd> (Windows/Linux) or <kbd>Cmd+`</kbd> (macOS) to show or hide the terminal panel. You can also click the terminal icon in the titlebar area.
+  </Step>
+  <Step title="Resize the panel">
+    Drag the horizontal divider between the editor and the terminal to resize. ted remembers the height you set between sessions.
+  </Step>
+  <Step title="Run commands">
+    The terminal starts in your workspace root, so you can run build scripts, git commands, or any CLI tool immediately.
+  </Step>
+</Steps>
+
+<Tip>
+  You can have the terminal open and still interact with the editor above it — focus switches automatically when you click in either region.
+</Tip>
+
+## Command Palette
+
+The Command Palette is the fastest way to navigate your project or trigger editor actions without reaching for the mouse.
+
+Press <kbd>Ctrl+P</kbd> / <kbd>Cmd+P</kbd> to open it. As you type, ted performs fuzzy matching against:
+
+- **All files** in the current workspace — select a result to open it in a new tab.
+- **Editor commands** — actions like toggling word wrap, changing the theme, or reloading the window.
+
+<Info>
+  The Command Palette closes automatically when you select a result or press <kbd>Escape</kbd>.
+</Info>
+
+## Swarms View
+
+The Swarms view is a separate, full-window perspective designed for **multi-agent coordination**. Instead of a single agent working in the Agent panel, Swarms lets you monitor and direct several agents operating in parallel — each with its own task, output stream, and file context.
+
+Toggle the Swarms view by clicking its icon in the **titlebar area**. The editor, terminal, and sidebar remain accessible; switching back restores your previous layout exactly.
+
+<Note>
+  The Swarms view is an advanced feature intended for orchestrating complex, multi-step workflows. For everyday single-agent assistance, the Agent sidebar panel is sufficient.
+</Note>
+
+## Keyboard Shortcuts
+
+| Action | Windows / Linux | macOS |
+|---|---|---|
+| Save file | `Ctrl+S` | `Cmd+S` |
+| Close tab | `Ctrl+W` | `Cmd+W` |
+| Command Palette | `Ctrl+P` | `Cmd+P` |
+| Settings | `Ctrl+,` | `Cmd+,` |
+| Toggle terminal | `Ctrl+\`` | `Cmd+\`` |

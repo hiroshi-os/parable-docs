@@ -1,0 +1,98 @@
+---
+title: "Themes and Visual Customization in ted"
+sidebarTitle: "Themes"
+description: "ted ships with four built-in themes: ted dark, ted light, ted solarized, and ted solarized light. Switch themes in Settings under Appearance."
+---
+
+ted includes four built-in themes that affect both syntax highlighting and the editor chrome — every color in the interface, from the sidebar background to keyword tokens in your code, is defined by the active theme. Switching themes is instant and applies everywhere without restarting.
+
+## Switching Themes
+
+Open settings with `Ctrl+,` on Windows/Linux or `Cmd+,` on macOS, navigate to the **Appearance** section, and select a theme from the **Theme** dropdown. The change takes effect immediately.
+
+You can also set the theme directly in your settings file:
+
+```json
+{
+  "theme": "ted solarized light"
+}
+```
+
+## Built-in Themes
+
+<CardGroup cols={2}>
+  <Card title="ted (default)" icon="moon">
+    The default dark theme with muted violet accents. Designed for long coding sessions in low-light environments.
+  </Card>
+  <Card title="ted light" icon="sun">
+    A light variant that shares the same accent palette as the default dark theme — familiar if you switch between environments.
+  </Card>
+  <Card title="ted solarized" icon="circle-half-stroke">
+    A dark theme inspired by the Solarized palette. Warm background tones with carefully balanced foreground contrast.
+  </Card>
+  <Card title="ted solarized light" icon="circle-half">
+    The light counterpart to ted solarized, using the same warm base colors with a bright background.
+  </Card>
+</CardGroup>
+
+Valid values for the `theme` setting:
+
+| Value | Variant |
+|---|---|
+| `"ted"` | Dark (default) |
+| `"ted light"` | Light |
+| `"ted solarized"` | Dark, Solarized-inspired |
+| `"ted solarized light"` | Light, Solarized-inspired |
+
+## How the Theme System Works
+
+ted uses a semantic theming approach. Each theme defines two sets of tokens:
+
+- **Syntax tokens** — colors for language constructs like keywords, strings, comments, function names, and type annotations. These power CodeMirror's syntax highlighting layer.
+- **UI tokens** — colors for chrome elements like the sidebar, tab bar, status bar, panel backgrounds, borders, and icon tints.
+
+Both sets are applied atomically when you switch themes, so there is no mismatch between editor colors and UI colors. ted does not currently support loading external or custom theme files — all four themes are bundled with the application.
+
+## Per-project Theme Overrides
+
+You can set a different theme for a specific project by adding a `theme` key to that project's `.ted/settings.json`:
+
+```json
+{
+  "theme": "ted light"
+}
+```
+
+This overrides your global theme preference only while that project folder is open. Your user-level theme is restored when you switch to another project.
+
+## Appearance Settings
+
+Beyond the theme, two other settings in the Appearance category affect the visual experience:
+
+### Sound Volume
+
+The navigation tape spinner in ted plays a subtle click sound. The `volume` setting controls its loudness on a scale of 0–100:
+
+```json
+{
+  "volume": 0
+}
+```
+
+Set `volume` to `0` to silence it completely. The default is `50`.
+
+### UI Motion Blur
+
+The `uiBlur` setting adds a subtle motion blur effect during panel transitions:
+
+```json
+{
+  "uiBlur": true
+}
+```
+
+It is disabled by default. Enable it if you prefer animated panel transitions with a cinematic feel, or leave it off for a snappier, lower-motion interface.
+
+<Tip>
+If you experience performance issues during panel transitions, make sure `uiBlur` is set to `false` (the default). Motion blur compositing can be GPU-intensive on lower-powered machines.
+</Tip>

@@ -1,0 +1,64 @@
+---
+title: "Git Integration in ted: Status, History, Blame, and More"
+sidebarTitle: "Overview"
+description: "ted has deep git integration built in: view file status, stage changes, commit, browse commit history, and see line-level blame — no external tool needed."
+---
+
+ted integrates git directly into the editor — no separate git GUI or terminal required for day-to-day version control tasks. Whether you're staging a quick fix, browsing a file's full commit history, or tracking down who wrote a particular line, every git operation you need is a click or keystroke away, without leaving your workspace.
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="Source Control Panel" icon="code-branch">
+    See all changed files at a glance. Stage or unstage individual files, write your commit message, and commit — all from the sidebar without touching a terminal.
+  </Card>
+  <Card title="Git Gutter" icon="left-right">
+    Lines added or modified since the last commit are marked directly in the editor margin. Green indicates an added line; orange or yellow marks a modification.
+  </Card>
+  <Card title="Commit History" icon="clock-rotate-left">
+    Browse the full commit log in a visual graph. Click any commit to see its diff summary — files changed, insertions, and deletions — and open any file at that revision.
+  </Card>
+  <Card title="Blame" icon="user">
+    Move your cursor to any line to see inline ghost text showing the commit hash, author, and date of the last change to that line.
+  </Card>
+</CardGroup>
+
+### File churn
+
+ted also tracks *file churn* — how frequently each file changes over a configurable time window. The built-in AI agent uses churn data to prioritize suggestions and surface context for the files that are evolving fastest in your codebase. You don't need to configure anything; churn analysis runs automatically in the background.
+
+## Prerequisites
+
+ted's git integration is powered by **libgit2** (via the `git2` Rust crate), which ships inside the application. You do not need a system `git` installation for core features.
+
+<Note>
+  Your project must be a git repository — that is, it must contain a `.git` directory at its root. ted detects this automatically when you open a folder. If the folder is not a git repo, the Source Control panel and related features will remain inactive.
+</Note>
+
+## Quick start
+
+<Steps>
+  <Step title="Open a git repository">
+    Use **File → Open Folder** (or drag a folder onto the ted window) to open a directory that contains a `.git` folder. ted immediately reads the repository state and activates all git features.
+  </Step>
+  <Step title="Open the Source Control panel">
+    Click the branch icon in the left sidebar to open the **Source Control** panel. You'll see a list of changed files, a staging area, and a commit message input.
+  </Step>
+  <Step title="Explore history and blame">
+    Click the clock icon to open **Commit History**, or move your cursor to any line in the editor to see its **blame annotation** appear as ghost text.
+  </Step>
+</Steps>
+
+## What's covered in this section
+
+<CardGroup cols={3}>
+  <Card title="Status & Staging" icon="list-check" href="/git/status-and-staging">
+    Stage files, write commit messages, view diffs, and use the git gutter.
+  </Card>
+  <Card title="Commit History" icon="timeline" href="/git/commit-history">
+    Browse the visual commit graph, filter by file, and inspect commit details.
+  </Card>
+  <Card title="Blame" icon="magnifying-glass" href="/git/blame">
+    Read per-line blame annotations inline, right inside the editor.
+  </Card>
+</CardGroup>

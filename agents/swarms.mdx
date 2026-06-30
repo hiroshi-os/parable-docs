@@ -1,0 +1,163 @@
+---
+title: "Coordinate Multiple AI Agents with Swarms"
+sidebarTitle: "Swarms"
+description: "ted Swarms lets you run multiple AI agents simultaneously, assign roles, track tasks on a Kanban board, and visualize agent interactions on a live graph."
+---
+
+Swarms is ted's multi-agent coordination view. Instead of a single agent working through your task sequentially, Swarms lets you run multiple AI agents in parallel — each with its own model, role, and system prompt — while tracking their collective progress on a Kanban board and watching their interactions unfold on a live force-directed graph. It's designed for large tasks that benefit from specialization: one agent architecting, another implementing, a third reviewing.
+
+## Opening the Swarms View
+
+Switch to Swarms from anywhere in ted:
+
+- **Titlebar toggle** — click the **Swarms** icon in the top titlebar to switch views
+- **Command Palette** — press `Ctrl+Shift+P` / `Cmd+Shift+P`, type **Swarms**, and select "Switch to Swarms view"
+
+To return to the standard editor, use the same titlebar toggle or Command Palette.
+
+## Swarm Sessions
+
+A **swarm session** is a named, persistent workspace that holds all the agents, chat history, Kanban tasks, and roles for a particular effort. Sessions persist across app restarts — you can close ted and pick up exactly where you left off.
+
+<Steps>
+  <Step title="Create a new session">
+    Click **New Session** in the Swarms sidebar. Give it a name that reflects the task (e.g., "Auth Refactor", "v2 API Sprint").
+  </Step>
+  <Step title="Add agents">
+    ted initializes each new session with one default agent. Add more from the Agents panel using the **+ Add Agent** button. Each agent you add can be assigned a different model and role.
+  </Step>
+  <Step title="Work the session">
+    Use the Chat panel to give the swarm instructions. Agents pick up tasks, update the Kanban board, and you can observe their progress on the force graph.
+  </Step>
+</Steps>
+
+---
+
+## The Five Swarms Views
+
+The Swarms interface has five panels you can use simultaneously. Each panel is dockable and resizable.
+
+### Agents Panel
+
+The Agents panel lists every agent active in the current session. For each agent you can see:
+
+| Field | Description |
+|---|---|
+| **Name** | The agent's display name (editable) |
+| **Model** | The LLM model assigned to this agent |
+| **Role** | The role assigned (e.g., Architect, Tester) — determines its system prompt |
+| **Status** | Whether the agent is idle, thinking, or assigned to an active task |
+| **Lead** | A crown icon marks the designated lead agent |
+
+Click any agent row to open its individual conversation history and trace log.
+
+---
+
+### Force Graph Map
+
+The Force Graph is a live, physics-based visualization of your swarm. Each agent appears as a **node**; as agents communicate or delegate tasks to one another, **edges** appear between them.
+
+- **Drag agents** around the canvas to arrange them however you like — positions persist in the session
+- The **lead agent** is visually distinguished (larger node, distinct color) so you can spot the coordinator at a glance
+- Nodes pulse or animate when an agent is actively thinking or executing a tool call
+
+<Info>
+  The force graph is purely visual — rearranging nodes doesn't affect how agents communicate. Use it to get a quick gestalt of swarm activity, especially in sessions with many agents.
+</Info>
+
+---
+
+### Chat Panel
+
+The Chat panel is the shared communication hub for the entire swarm. Messages sent here are visible to all agents, and agent replies are attributed by name so you can tell who said what.
+
+- Type a message and press **Enter** to broadcast it to the swarm
+- The **lead agent** reads incoming messages first and decides how to delegate work to other agents
+- Individual agents can also respond directly if the message is addressed to them or falls within their role
+
+---
+
+### Roles
+
+Roles let you give each agent a specialized identity. A role has:
+
+<ResponseField name="name" type="string">
+  A human-readable label (e.g., "Architect", "Tester", "Reviewer", "DevOps").
+</ResponseField>
+<ResponseField name="color" type="string">
+  A color used to visually identify the role in the Agents panel and force graph.
+</ResponseField>
+<ResponseField name="systemPrompt" type="string">
+  A custom system prompt prepended to every message this agent receives. This is how you specialize agent behavior — an Architect agent might be instructed to focus on interface design and module boundaries, while a Tester agent is told to write thorough test cases.
+</ResponseField>
+<ResponseField name="isDefault" type="boolean">
+  Whether this role is assigned to new agents automatically.
+</ResponseField>
+
+**To create or edit a role:**
+
+<Steps>
+  <Step title="Open the Roles editor">
+    Click the **Roles** tab in the Swarms sidebar, then click **+ New Role**.
+  </Step>
+  <Step title="Configure the role">
+    Set the name, pick a color, and write a system prompt that describes how agents with this role should behave and what they should focus on.
+  </Step>
+  <Step title="Assign to an agent">
+    In the Agents panel, click on an agent and select the role from the **Role** dropdown. The agent's system prompt updates immediately.
+  </Step>
+</Steps>
+
+**Example role prompts:**
+
+```
+Architect: You focus on high-level design decisions, module boundaries,
+and interface contracts. Before writing any code, define the types and
+interfaces involved and explain the design rationale.
+
+Tester: You write comprehensive test cases. For every function or module
+you're given, produce unit tests covering happy paths, edge cases, and
+error conditions. Use the project's existing test framework.
+
+Reviewer: You review code changes critically. Look for bugs, security
+issues, missing error handling, and deviations from project conventions.
+Provide specific, actionable feedback.
+```
+
+---
+
+### Kanban Board
+
+The Kanban board tracks the swarm's work as cards moving through columns. The default columns are **To Do**, **In Progress**, and **Done**, but you can add and rename columns to match your workflow.
+
+- **Agents create tasks automatically** as they decompose work — a lead agent might create a "Implement login endpoint" card and assign it to the backend agent
+- **You can also add tasks manually** using the **+ Add Task** button in any column
+- Drag cards between columns to update their status
+- Each card can be assigned to a specific agent
+
+<Tip>
+  Ask the lead agent to "break this task into Kanban cards" at the start of a session. It will analyze the work, create structured task cards, and assign them to appropriate agents based on their roles.
+</Tip>
+
+---
+
+### Models Deck
+
+The Models deck shows a card for every agent in the session, each displaying the LLM provider and model currently assigned to it. Click any card to change the provider or model for that agent without affecting others.
+
+---
+
+## The Lead Agent
+
+One agent per session can be designated the **lead**. The lead agent:
+
+- Reads incoming chat messages first
+- Decides how to delegate subtasks to other agents based on their roles
+- Aggregates and synthesizes results from other agents into a coherent response
+- Coordinates the overall strategy for complex, multi-step work
+
+Set the lead agent by clicking the **Set as Lead** option in an agent's context menu in the Agents panel. A crown icon marks the current lead throughout the UI.
+
+<Tip>
+  Use different LLM providers for different agents to play to each model's strengths. For example, run fast local Ollama models for repetitive search-and-replace tasks, and assign a Claude or GPT-4o agent as the lead for high-level reasoning and coordination.
+</Tip>

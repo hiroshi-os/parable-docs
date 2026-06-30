@@ -1,0 +1,116 @@
+---
+title: "AI Agent System in ted: How It Works"
+sidebarTitle: "Overview"
+description: "ted's AI agent runs a multi-step reasoning loop with file, shell, and browser tools. Learn how the agent executes tasks and what it can do."
+---
+
+ted includes a built-in AI agent that can read and edit your code, run terminal commands, search your codebase, and even control a browser — all without leaving the editor. Rather than offering a simple autocomplete box, ted's agent reasons through multi-step tasks autonomously, calling tools as needed and feeding results back into its thinking until the job is done.
+
+## How the Agent Works
+
+At the heart of ted's agent is `runAgentLoop()` — a reasoning loop that drives every task you hand to the agent. When you send a message, the agent doesn't just reply with text; it plans, acts, observes, and iterates.
+
+<Steps>
+  <Step title="You send a message">
+    You type an instruction in the Agent Panel (e.g., "Refactor `fetchUser` to handle 404 errors") and press Enter.
+  </Step>
+  <Step title="The agent reasons and calls tools">
+    The agent reads your message along with its system prompt and any prior conversation. It decides which tool to call first — for example, `read_file` to read the relevant source file — and emits a structured tool call in the format ` ```tool {"name": "read_file", ...} ``` `.
+  </Step>
+  <Step title="ted executes the tool">
+    ted intercepts the tool call, runs the corresponding action (reading the file, running a command, searching your codebase, etc.), and returns the result to the agent.
+  </Step>
+  <Step title="The agent reasons again">
+    Armed with the tool result, the agent continues reasoning. It may call another tool, or it may decide it has enough information to produce a final response.
+  </Step>
+  <Step title="Repeat until done">
+    This loop runs for up to **15 iterations**. The agent stops when it produces a response with no further tool calls, or when the iteration limit is reached.
+  </Step>
+</Steps>
+
+<Note>
+  The 15-iteration cap prevents runaway loops on complex tasks. If the agent hits this limit, it will summarize what it has done so far and ask you to continue the task with a follow-up message.
+</Note>
+
+## The `// ... existing code ...` Edit Pattern
+
+When the agent edits a file with the `edit_file` tool, it doesn't need to rewrite the entire file. It uses a special marker — `// ... existing code ...` — to indicate that the surrounding code should be preserved as-is, while only the lines it specifies are inserted or replaced.
+
+```typescript
+// ... existing code ...
+
+async function fetchUser(id: string) {
+  const response = await fetch(`/api/users/${id}`);
+  if (response.status === 404) {
+    throw new UserNotFoundError(id);
+  }
+  return response.json();
+}
+
+// ... existing code ...
+```
+
+This keeps edits surgical and readable in the trace view — you can see exactly what changed without wading through an entire file rewrite.
+
+## Inline Suggestions
+
+The agent isn't only active when you explicitly send a message. ted's `LLMAgent` also watches passively while you work. After your editor has been **idle for approximately 5 seconds**, it analyzes the current file context — including file content, AST structure, git churn signals, and your recent editing actions — and may generate an inline code suggestion.
+
+Suggestions appear as **toast notifications** in the corner of the editor. You can:
+
+- **Accept** — applies the suggestion inline at the current cursor position
+- **Dismiss** — discards the suggestion without making any changes
+
+<Tip>
+  Inline suggestions are most useful when you've just written a function signature or left a comment describing what you want. The agent picks up those hints and drafts the implementation for you.
+</Tip>
+
+## Action Traces
+
+Every tool call the agent makes during a task is recorded and displayed in the Agent Panel as a collapsible **trace entry**. Each trace shows:
+
+- The tool name (e.g., `read_file`, `run_terminal_cmd`)
+- The arguments passed to the tool
+- The result or output returned
+
+Traces let you audit exactly what the agent did — which files it read, which commands it ran, and what it found. You can expand or collapse individual trace entries to focus on the parts you care about.
+
+<Warning>
+  The agent has access to your local filesystem and can execute terminal commands. Always review the trace when the agent makes changes to files or runs shell commands, especially in unfamiliar codebases.
+</Warning>
+
+## What the Agent Can Do
+
+ted's agent has 17 built-in tools spanning four categories:
+
+<CardGroup cols={2}>
+  <Card title="File Operations" icon="file-code">
+    Read files, list directories, edit files with surgical precision, delete files, and search by glob pattern.
+  </Card>
+  <Card title="Codebase Search" icon="magnifying-glass">
+    Ripgrep pattern search and semantic-style codebase search across any directories you specify.
+  </Card>
+  <Card title="Shell Commands" icon="terminal">
+    Run arbitrary terminal commands, poll long-running background processes, and schedule future messages to itself.
+  </Card>
+  <Card title="Browser Automation" icon="globe">
+    Open URLs, click elements, type into inputs, scroll, hover, read page text, and close browser windows — all from within ted.
+  </Card>
+</CardGroup>
+
+## Learn More
+
+<CardGroup cols={2}>
+  <Card title="Agent Panel" icon="message-bot" href="/agents/agent-panel">
+    How to send messages, read traces, and manage conversation history.
+  </Card>
+  <Card title="Tools Reference" icon="wrench" href="/agents/tools">
+    Full reference for all 17 agent tools with arguments and examples.
+  </Card>
+  <Card title="Swarms" icon="circle-nodes" href="/agents/swarms">
+    Run multiple agents in parallel with roles, Kanban, and a live graph.
+  </Card>
+  <Card title="LLM Providers" icon="cpu" href="/agents/llm-providers">
+    Connect to Ollama, OpenAI, Anthropic, or Google Gemini.
+  </Card>
+</CardGroup>

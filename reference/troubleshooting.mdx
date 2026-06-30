@@ -1,0 +1,213 @@
+---
+title: "Troubleshooting Common ted Issues"
+sidebarTitle: "Troubleshooting"
+description: "Solutions to common ted issues: build failures, Tauri startup errors, LSP not working, Ollama connection errors, and extension loading problems."
+---
+
+If ted isn't working as expected, this page covers the most common issues and how to fix them. Each section describes the symptom, the most likely cause, and the steps to resolve it. If your issue isn't listed here, check the [FAQ](/reference/faq) or open a GitHub issue.
+
+<AccordionGroup>
+  <Accordion title='"bun tauri dev" fails immediately'>
+    This usually means a missing Rust toolchain or Tauri system dependency.
+
+    **Check that Rust is installed:**
+
+    ```bash
+    rustc --version
+    cargo --version
+    ```
+
+    If either command returns "command not found", install Rust via [rustup](https://rustup.rs/):
+
+    ```bash
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    ```
+
+    **Check Tauri prerequisites:**
+
+    Tauri requires additional system libraries depending on your platform. Follow the official prerequisite guide at [tauri.app/start/prerequisites](https://tauri.app/start/prerequisites/) for your OS.
+
+    **Make sure dependencies are installed:**
+
+    ```bash
+    bun install
+    ```
+
+    Run this from the repository root before attempting `bun tauri dev`. Missing `node_modules` is a common cause of early build failures.
+  </Accordion>
+
+  <Accordion title="ted window does not open after launch">
+    The application process starts but no window appears. This is almost always a missing WebView dependency.
+
+    **On Linux:** ted requires `webkit2gtk` and related packages. Install them with:
+
+    ```bash
+    # Debian / Ubuntu
+    sudo apt install libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+
+    # Fedora
+    sudo dnf install webkit2gtk4.1-devel gtk3-devel
+    ```
+
+    See the [Tauri Linux prerequisites](https://tauri.app/start/prerequisites/#linux) for the full list.
+
+    **On Windows:** ted requires Microsoft Edge WebView2, which ships with Windows 11 by default. On Windows 10, download and install the WebView2 runtime from [Microsoft's site](https://developer.microsoft.com/en-us/microsoft-edge/webview2/).
+  </Accordion>
+
+  <Accordion title="Syntax highlighting is not working">
+    ted loads tree-sitter grammar WASM files in a background worker. Highlighting may not appear immediately when you first open a file.
+
+    **Wait a moment.** The grammar worker initializes asynchronously — highlighting typically appears within one to two seconds of opening a file.
+
+    **If it never appears:** open the DevTools console by right-clicking anywhere in the ted window and selecting **Inspect**, then switch to the **Console** tab. Look for errors related to the worker or WASM loading. A failed grammar fetch (e.g., a missing `.wasm` file) will be reported there.
+
+    <Note>
+    This only affects syntax coloring. The editor remains fully functional while grammars are loading.
+    </Note>
+  </Accordion>
+
+  <Accordion title="LSP completions are not appearing">
+    Code intelligence requires the language server binary to be installed and reachable on your `PATH`.
+
+    **Verify the server is installed.** For TypeScript, run:
+
+    ```bash
+    typescript-language-server --version
+    ```
+
+    If you get "command not found", install it:
+
+    ```bash
+    npm install -g typescript-language-server typescript
+    ```
+
+    See the [LSP Setup](/configuration/lsp) page for install commands for other languages.
+
+    **Check that LSP is enabled** in your settings:
+
+    ```json
+    {
+      "lsp": {
+        "enabled": true
+      }
+    }
+    ```
+
+    **Give it time.** Language servers can take several seconds to initialize the first time you open a file in a project, especially for large Rust or TypeScript projects. Completions appear once the server finishes indexing.
+
+    If problems persist, check the DevTools console for error messages from the LSP manager.
+  </Accordion>
+
+  <Accordion title="Ollama agent is not responding">
+    The AI assistant panel shows no response or an error when Ollama is your configured provider.
+
+    **Make sure Ollama is running:**
+
+    ```bash
+    ollama serve
+    ```
+
+    Leave this terminal open, or configure Ollama to run as a background service.
+
+    **Make sure the model is pulled:**
+
+    ```bash
+    ollama list
+    ```
+
+    If your configured model isn't in the list, pull it:
+
+    ```bash
+    ollama pull mistral
+    ```
+
+    **Check the Base URL** in Settings → AI Assistant. It should be:
+
+    ```
+    http://localhost:11434
+    ```
+
+    If you've changed this or left it empty after previously setting a custom value, reset it to the default above.
+  </Accordion>
+
+  <Accordion title="OpenAI / Anthropic / Google API errors">
+    Cloud LLM providers return errors for a few common reasons:
+
+    - **Invalid API key** — double-check the key you pasted into settings. Make sure there are no leading or trailing spaces.
+    - **Insufficient credits or quota** — log into your provider's dashboard and verify your account has available credits or has not hit a rate limit.
+    - **Wrong model name** — verify the model name matches exactly what your account has access to. For example, `gpt-4o` requires a paid OpenAI account; `claude-3-5-sonnet-20241022` requires an Anthropic API key with access to that model tier.
+
+    <Warning>
+    Your API key is stored in plain text in `~/.config/ted/settings.json`. Do not check this file into version control.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="An extension is not loading">
+    ted logs extension loading errors to the DevTools console.
+
+    **Check `manifest.json` is valid JSON.** Open it in ted and look for syntax errors — a trailing comma or missing quote is enough to prevent the extension from loading.
+
+    **Verify the `main` field** in `manifest.json` points to an existing JavaScript file relative to the extension folder:
+
+    ```json
+    {
+      "main": "index.js"
+    }
+    ```
+
+    If the file at that path doesn't exist, the extension silently fails to activate.
+
+    **Open DevTools** (right-click → Inspect → Console) and reload ted. Extension errors are printed there with the extension name and a stack trace.
+  </Accordion>
+
+  <Accordion title="Settings are not saving">
+    If changes you make in the settings popup don't persist after closing and reopening ted, ted may not have write access to its config directory.
+
+    **Check that the directory exists and is writable:**
+
+    ```bash
+    ls -la ~/.config/ted/
+    ```
+
+    If the directory doesn't exist, create it:
+
+    ```bash
+    mkdir -p ~/.config/ted
+    ```
+
+    Then try saving settings again. If the directory exists but is read-only, fix the permissions:
+
+    ```bash
+    chmod u+rw ~/.config/ted/settings.json
+    ```
+  </Accordion>
+
+  <Accordion title="Git features are not working">
+    ted's git integration uses libgit2 directly — it does not shell out to the `git` binary. This means:
+
+    - The folder you have open **must be a git repository** (it must contain a `.git` directory at its root or in a parent directory).
+    - SSH-based remotes require your SSH keys to be available to the `ssh-agent`.
+    - GPG commit signing is not currently supported.
+
+    If the Source Control panel shows no changes or errors, verify you opened the project root (the directory containing `.git`), not a subdirectory.
+  </Accordion>
+
+  <Accordion title="The integrated terminal is not starting">
+    ted spawns a platform-specific shell when you open the terminal panel:
+
+    | Platform | Shell |
+    |---|---|
+    | Linux / macOS | `bash` |
+    | Windows | `powershell.exe` |
+
+    If the terminal panel opens but immediately shows an error, make sure the expected shell is available in your `PATH`.
+
+    **On macOS** with a non-default shell (e.g., zsh or fish): ted currently launches `bash` explicitly. You can start your preferred shell from within the terminal by typing `zsh` or `fish` after it opens.
+
+    **On Windows**: if PowerShell is restricted by an execution policy, run the following in an admin PowerShell window to allow scripts:
+
+    ```bash
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+    ```
+  </Accordion>
+</AccordionGroup>

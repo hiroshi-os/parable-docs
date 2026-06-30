@@ -1,0 +1,115 @@
+{
+  "projectType": "frontend",
+  "projectName": "ted",
+  "projectDescription": "A minimalist, agent-first desktop code editor built for AI-assisted development, featuring tree-sitter syntax highlighting, integrated git, LSP support, multi-agent swarms, and a built-in extension system.",
+  "theme": "willow",
+  "primaryColor": "#7C6EF2",
+  "lightColor": "#A59EF8",
+  "darkColor": "#4B41C9",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Editor",
+            "pages": [
+              "editor/interface",
+              "editor/editing",
+              "editor/syntax-highlighting",
+              "editor/tabs-and-panes"
+            ]
+          },
+          {
+            "group": "AI Agents",
+            "pages": [
+              "agents/overview",
+              "agents/agent-panel",
+              "agents/tools",
+              "agents/swarms",
+              "agents/llm-providers"
+            ]
+          },
+          {
+            "group": "Git Integration",
+            "pages": [
+              "git/overview",
+              "git/status-and-staging",
+              "git/commit-history",
+              "git/blame"
+            ]
+          },
+          {
+            "group": "Extensions",
+            "pages": [
+              "extensions/overview",
+              "extensions/installing",
+              "extensions/api-reference"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/settings",
+              "configuration/lsp",
+              "configuration/themes",
+              "configuration/keybindings"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "reference/troubleshooting",
+              "reference/faq"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Tree-sitter syntax highlighting for JavaScript, TypeScript, Python, Rust, C++, HTML, CSS, JSON, YAML, Markdown, and more",
+    "Multi-pane buffer management with drag-and-drop tab reordering",
+    "AI agent execution loop with tool-calling (read, write, grep, shell, browser control)",
+    "Swarms view: multi-agent coordination with force-directed graph, Kanban board, and chat",
+    "Integrated git: visual commit history, line-level blame, status panel, staging, and commit",
+    "Language Server Protocol (LSP) support with completions, diagnostics, hover, and go-to-definition",
+    "Built-in PTY terminal (bash / PowerShell)",
+    "Extension system with a full TedAPI surface for commands, panels, status bar, file icons, and fs access",
+    "Multiple LLM providers: Ollama (local), OpenAI, Anthropic (Claude), Google (Gemini)",
+    "Semantic theming system with light and dark variants",
+    "High-density file tree (20px row height) optimized for large projects",
+    "Command palette for fast keyboard-driven navigation"
+  ],
+  "publicApiSurface": [
+    "TedAPI.editor.openFile(path)",
+    "TedAPI.editor.getActiveFile()",
+    "TedAPI.editor.showNotification(message, type)",
+    "TedAPI.editor.setSelection(anchor, head)",
+    "TedAPI.editor.getSelection()",
+    "TedAPI.commands.register(id, label, handler)",
+    "TedAPI.sidebar.registerPanel(id, label, render)",
+    "TedAPI.statusbar.addItem(id, text, opts)",
+    "TedAPI.statusbar.updateItem(id, text)",
+    "TedAPI.statusbar.removeItem(id)",
+    "TedAPI.workspace.getPath()",
+    "TedAPI.fs.readFile(path)",
+    "TedAPI.fs.writeFile(path, content)",
+    "TedAPI.fs.listDir(path)",
+    "TedAPI.window.showQuickPick(items, options)",
+    "TedAPI.window.showInputBox(options)",
+    "TedAPI.icons.registerFileIconProvider(provider)",
+    "TedAPI.onEvent(event, handler)",
+    "ExtensionManifest: { name, version, displayName, description, main, activationEvents }",
+    "Agent tools: read_file, edit_file, list_dir, grep, codebase_search, file_search, delete_file, run_terminal_cmd, browser_open, browser_click, browser_type, browser_read, browser_scroll, browser_hover, browser_close, schedule_request",
+    "Settings: autoSave, theme, fontSize, lineNumbers, indentGuides, volume, uiBlur, sidebarWidth, llm.provider, llm.model, llm.apiKey, llm.baseUrl, lsp.enabled, lsp.servers"
+  ]
+}

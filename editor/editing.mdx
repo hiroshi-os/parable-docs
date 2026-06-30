@@ -1,0 +1,100 @@
+---
+title: "Writing and Editing Code in ted"
+sidebarTitle: "Editing"
+description: "How to write and edit code in ted: auto-save, the diff viewer, find and replace, indentation, and working with the editor gutter."
+---
+
+ted uses [CodeMirror 6](https://codemirror.net/) as its editing engine, giving you a fast, extensible text editing surface with first-class support for modern language tooling. Every editing feature described on this page works inside that CodeMirror pane — no separate modes or views to switch between.
+
+## Auto-Save
+
+ted can automatically write your changes to disk as you type, so you never lose work to a forgotten <kbd>Ctrl+S</kbd>.
+
+<Steps>
+  <Step title="Enable auto-save">
+    Open **Settings** (<kbd>Ctrl+,</kbd> / <kbd>Cmd+,</kbd>), navigate to the **General** category, and toggle **Auto Save** on.
+  </Step>
+  <Step title="Save manually when auto-save is off">
+    If you prefer explicit saves, leave Auto Save disabled and use <kbd>Ctrl+S</kbd> / <kbd>Cmd+S</kbd> any time you want to flush changes to disk. Unsaved files show a **•** dot on their tab.
+  </Step>
+</Steps>
+
+<Tip>
+  Auto-save is especially useful when running a dev server that watches for file changes — ted will continuously feed it your latest edits without any extra keystrokes.
+</Tip>
+
+## Find and Replace
+
+ted bundles the `@codemirror/search` extension for in-file search and replace.
+
+Press <kbd>Ctrl+F</kbd> / <kbd>Cmd+F</kbd> to open the search bar at the bottom of the editor pane. From there you can:
+
+- **Basic find** — type a query to jump to the first match; use <kbd>Enter</kbd> / <kbd>Shift+Enter</kbd> to move forward and backward through results.
+- **Regular expressions** — click the `.*` toggle in the search bar to switch to regex mode. Standard JavaScript regex syntax is supported.
+- **Replace** — expand the search bar to show the replace field, enter your replacement string, then use **Replace** (single occurrence) or **Replace All** to apply the change across the entire file.
+
+<Note>
+  The search bar dismisses when you press <kbd>Escape</kbd> or click back in the editor. Your search query is preserved until you clear it.
+</Note>
+
+## Indentation Guides
+
+Visual indent guides draw subtle vertical lines through each indentation level, making deeply nested code easier to scan at a glance. They are rendered by the `@replit/codemirror-indentation-markers` extension.
+
+Toggle them in **Settings → Editor → Indent Guides**.
+
+## Line Numbers
+
+Line numbers appear in the left margin of the editor by default. If you prefer a cleaner look, turn them off in **Settings → Editor → Line Numbers**.
+
+<Info>
+  Even with line numbers hidden, the git gutter markers (see below) remain visible in their own narrow column.
+</Info>
+
+## Font Size
+
+Adjust the editor's font size in **Settings → Editor → Font Size**. The value is set in pixels and applies to the entire editor surface, including the terminal panel.
+
+## Diff Viewer
+
+When you need to compare two versions of a file — for example, to review a change before committing — ted opens a **side-by-side diff view** powered by `@codemirror/merge`.
+
+The diff view renders the old version on the left and the new version on the right, with insertions highlighted in green and deletions in red. Both sides are scrolled in sync so it is easy to follow changes through the file.
+
+<Note>
+  The diff viewer is read-only. To edit the file, close the diff tab and reopen the file as a regular editor tab.
+</Note>
+
+## The Git Gutter
+
+The git gutter is the thin margin column between the line numbers and your code. It shows per-line annotations based on the diff between your working tree and the last git commit:
+
+| Marker | Meaning |
+|---|---|
+| `+` (green) | Line was added and does not exist in the last commit |
+| `~` (yellow/amber) | Line was modified since the last commit |
+
+Lines that are unchanged carry no marker, keeping the gutter quiet when nothing has been edited. The gutter updates live as you type.
+
+## Git Blame
+
+On the line where your cursor currently rests, ted renders **inline ghost text** showing the commit author and date responsible for that line. The ghost text appears to the right of your code and fades in automatically — it does not shift your content or affect cursor position.
+
+## Per-Project Settings
+
+ted resolves settings in two layers: your user-level preferences and an optional project-level override.
+
+<Tip>
+  Create a `.ted/settings.json` file at the root of your workspace to override any user-level setting for that specific project. For example, you can enforce a particular indent width or disable auto-save for repos that use their own git hooks.
+</Tip>
+
+```json
+// .ted/settings.json
+{
+  "editor.indentSize": 2,
+  "editor.autoSave": false,
+  "editor.lineNumbers": true
+}
+```
+
+Project-level settings take precedence over user-level settings for every workspace session that opens that folder.

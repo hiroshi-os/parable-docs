@@ -1,0 +1,62 @@
+---
+title: "Line-Level Git Blame in the ted Editor"
+sidebarTitle: "Blame"
+description: "ted shows git blame information as inline ghost text on the current line, displaying the commit hash, author, and date of the last change."
+---
+
+ted displays git blame annotations as ghost text directly in the editor — move your cursor to any line to see who last changed it and when. The annotation appears at the end of the line in faint, unobtrusive text, giving you authorship context without interrupting your reading or editing flow.
+
+## How it works
+
+The blame extension watches your cursor position in real time. Each time you move to a new line, ted calls `git_blame` for that line via libgit2 and renders the result as inline ghost text at the end of the current line. The operation is non-blocking: the annotation appears within milliseconds and does not stall the editor.
+
+<Info>
+  Blame is powered by `git-blame.ts`, a CodeMirror editor extension that hooks into the cursor-change event and dispatches a decoration update whenever the active line changes.
+</Info>
+
+## What the annotation shows
+
+Each blame annotation contains three pieces of information:
+
+| Field | Example | Description |
+|---|---|---|
+| **Hash** | `a3f9c12` | Short (7-character) commit hash of the last change |
+| **Author** | `Maya Patel` | Name of the committer as recorded in git |
+| **Date** | `2 days ago` | Relative time since the commit was made |
+
+The annotation reads like: `a3f9c12 · Maya Patel · 2 days ago`, rendered as ghost text after the last character on the line.
+
+## No configuration needed
+
+Blame is active by default for every file that belongs to a git repository. You do not need to enable it in settings or run any command. If the file is not tracked by git, the annotation is simply absent.
+
+<Note>
+  Blame annotations are read-only and decorative — they do not affect the file content, the editor's undo history, or any git state.
+</Note>
+
+## Combining blame with Commit History
+
+Blame and Commit History are designed to work together.
+
+<Steps>
+  <Step title="Spot an interesting annotation">
+    Move your cursor to a line whose blame annotation — author, date, or hash — you want to investigate further.
+  </Step>
+  <Step title="Note the commit hash">
+    Read the short hash from the ghost text (e.g., `a3f9c12`).
+  </Step>
+  <Step title="Open Commit History">
+    Click the clock icon in the sidebar to open the Commit History panel.
+  </Step>
+  <Step title="Locate the commit">
+    Find the matching hash in the commit graph. Click it to expand the full diff summary, see every file the commit touched, and read the original commit message.
+  </Step>
+</Steps>
+
+<Tip>
+  This workflow is especially useful for understanding *why* a line exists: the commit message and surrounding diff often contain the rationale that isn't visible in the code itself.
+</Tip>
+
+## Annotation updates as you move
+
+The blame annotation always reflects the line where the cursor currently sits. As you navigate through a file — whether by clicking, using arrow keys, or jumping with `Ctrl+G` / `Cmd+G` — the annotation updates automatically to show the blame for the new current line.
